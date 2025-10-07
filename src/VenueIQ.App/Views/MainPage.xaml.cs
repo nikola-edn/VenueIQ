@@ -41,6 +41,7 @@ namespace VenueIQ.App.Views
             };
 
             AnalyzeButton.Clicked += async (_, __) => await RunAnalysisAsync();
+            ResultsList_SelectionSetup();
         }
 
         private CancellationTokenSource? _renderCts;
@@ -62,10 +63,12 @@ namespace VenueIQ.App.Views
                 {
                     var geo = GeoJsonHelper.BuildFeatureCollection(res.CellDetails);
                     await Map.UpdateHeatmapAsync(geo, _renderCts.Token);
+                    vm.SetResults(res.CellDetails);
                 }
                 else
                 {
                     await Map.ClearHeatmapAsync(_renderCts.Token);
+                    vm.Results.Clear();
                 }
             }
             catch (OperationCanceledException)
@@ -80,6 +83,24 @@ namespace VenueIQ.App.Views
             {
                 MapLoadingOverlay.IsVisible = false;
             }
+        }
+
+        private void ResultsList_SelectionSetup()
+        {
+            // Hook selection events to center the map
+            // Handle via BindingContext changes
+            this.PropertyChanged += async (s, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.Selected))
+                {
+                    var vm = (MainViewModel)BindingContext;
+                    var sel = vm.Selected;
+                    if (sel is not null)
+                    {
+                        await Map.CenterOnAsync(sel.Lat, sel.Lng, sel.Score);
+                    }
+                }
+            };
         }
     }
 }

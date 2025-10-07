@@ -19,4 +19,12 @@
   <data name="Toast_LanguageChanged" xml:space="preserve"><value>Language changed.</value></data>
   <data name="Toast_PrefsReset" xml:space="preserve"><value>Preferences reset to defaults.</value></data>
   <data name="Main_LoadingMap" xml:space="preserve"><value>Loading map...</value></data>
+  <data name="badge_high_competition" xml:space="preserve"><value>High competition</value></data>
+  <data name="badge_strong_complements" xml:space="preserve"><value>Strong complements</value></data>
+  <data name="badge_good_access" xml:space="preserve"><value>Good access</value></data>
+  <data name="badge_high_demand" xml:space="preserve"><value>High demand</value></data>
+  <data name="rationale_strong_complements" xml:space="preserve"><value>Strong presence of complementary places nearby</value></data>
+  <data name="rationale_good_access" xml:space="preserve"><value>Good access to parking and transit</value></data>
+  <data name="rationale_high_demand" xml:space="preserve"><value>High potential demand in the area</value></data>
+  <data name="rationale_high_competition" xml:space="preserve"><value>High competition density</value></data>
 </root>

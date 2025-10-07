@@ -46,6 +46,15 @@
           });
           map.layers.add(window.venueiq.heatLayer);
 
+          // Highlight layer for selection
+          window.venueiq.hlSource = new atlas.source.DataSource('venueiq-hl');
+          map.sources.add(window.venueiq.hlSource);
+          window.venueiq.hlLayer = new atlas.layer.SymbolLayer(window.venueiq.hlSource, 'venueiq-hl-layer', {
+            iconOptions: { image: 'marker-blue', allowOverlap: true },
+            textOptions: { textField: ['format', ['round', ['get', 'score'], 2]], offset: [0, -2] }
+          });
+          map.layers.add(window.venueiq.hlLayer);
+
           window.venueiq.updateHeatmapB64 = function(b64){
             try {
               const json = JSON.parse(atob(b64));
@@ -63,6 +72,17 @@
           window.venueiq.clearHeatmap = function(){
             window.venueiq.datasource && window.venueiq.datasource.clear();
             window.location.href = 'app://mapRendered';
+          };
+
+          window.venueiq.centerOn = function(lon, lat, props){
+            try {
+              window.venueiq.hlSource.clear();
+              const shape = new atlas.Shape(new atlas.data.Point([lon, lat]), props || {});
+              window.venueiq.hlSource.add(shape);
+              map.setCamera({ center: [lon, lat], zoom: Math.max(map.getCamera().zoom, 14) });
+            } catch (e) {
+              window.location.href = 'app://mapError?' + encodeURIComponent(e.message || 'center');
+            }
           };
 
           // Notify host app

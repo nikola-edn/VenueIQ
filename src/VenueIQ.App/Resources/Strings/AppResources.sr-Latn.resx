@@ -19,4 +19,12 @@
   <data name="Toast_LanguageChanged" xml:space="preserve"><value>Jezik je promenjen.</value></data>
   <data name="Toast_PrefsReset" xml:space="preserve"><value>Preferencije su vraćene na podrazumevane vrednosti.</value></data>
   <data name="Main_LoadingMap" xml:space="preserve"><value>Učitavanje mape...</value></data>
+  <data name="badge_high_competition" xml:space="preserve"><value>Visoka konkurencija</value></data>
+  <data name="badge_strong_complements" xml:space="preserve"><value>Jaki komplementarni objekti</value></data>
+  <data name="badge_good_access" xml:space="preserve"><value>Dobra pristupačnost</value></data>
+  <data name="badge_high_demand" xml:space="preserve"><value>Visoka potražnja</value></data>
+  <data name="rationale_strong_complements" xml:space="preserve"><value>Jak prisustvo komplementarnih mesta u blizini</value></data>
+  <data name="rationale_good_access" xml:space="preserve"><value>Dobra povezanost parkinga i prevoza</value></data>
+  <data name="rationale_high_demand" xml:space="preserve"><value>Visok potencijal potražnje u oblasti</value></data>
+  <data name="rationale_high_competition" xml:space="preserve"><value>Velika gustina konkurencije</value></data>
 </root>

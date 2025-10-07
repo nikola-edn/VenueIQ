@@ -77,5 +77,12 @@ namespace VenueIQ.App.Controls
             var js = "window.venueiq && window.venueiq.clearHeatmap && window.venueiq.clearHeatmap()";
             return EvaluateJavaScriptAsync(js).WaitAsync(ct);
         }
+
+        public Task CenterOnAsync(double lat, double lng, double? score = null, CancellationToken ct = default)
+        {
+            var props = score.HasValue ? $", {score.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}" : string.Empty;
+            var js = $"window.venueiq && window.venueiq.centerOn && window.venueiq.centerOn({lng.ToString(System.Globalization.CultureInfo.InvariantCulture)}, {lat.ToString(System.Globalization.CultureInfo.InvariantCulture)}, {{ score: {(score.HasValue ? score.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "0")} }})";
+            return EvaluateJavaScriptAsync(js).WaitAsync(ct);
+        }
     }
 }

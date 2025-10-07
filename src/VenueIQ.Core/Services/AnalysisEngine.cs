@@ -92,6 +92,10 @@ public class AnalysisEngine
             cs.PrimaryBadge = ciN[i] > 0.7 ? "badge.high_competition" : (coiN[i] > 0.7 ? "badge.strong_complements" : null);
             if (aiN[i] > 0.6) cs.SupportingBadges.Add("badge.good_access");
             if (diN[i] > 0.6) cs.SupportingBadges.Add("badge.high_demand");
+            if (coiN[i] > 0.7) cs.RationaleTokens.Add("rationale.strong_complements");
+            if (aiN[i] > 0.6) cs.RationaleTokens.Add("rationale.good_access");
+            if (diN[i] > 0.6) cs.RationaleTokens.Add("rationale.high_demand");
+            if (ciN[i] > 0.7) cs.RationaleTokens.Add("rationale.high_competition");
             list.Add(cs);
         }
         return list;

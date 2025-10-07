@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using VenueIQ.App.Services;
 using VenueIQ.App.Utils;
+using System.Collections.ObjectModel;
+using VenueIQ.Core.Models;
 
 namespace VenueIQ.App.ViewModels;
 
@@ -61,4 +63,32 @@ public class MainViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    // Results
+    public ObservableCollection<ResultItemViewModel> Results { get; } = new();
+    private ResultItemViewModel? _selected;
+    public ResultItemViewModel? Selected { get => _selected; set { if (_selected != value) { _selected = value; OnPropertyChanged(); } } }
+
+    public void SetResults(IReadOnlyList<CellScore> cells, int topN = 10)
+    {
+        var sorted = cells.OrderByDescending(c => c.Score).Take(topN).ToList();
+        Results.Clear();
+        int rank = 1;
+        foreach (var c in sorted)
+        {
+            var vm = new ResultItemViewModel
+            {
+                Rank = rank++,
+                Score = Math.Round(c.Score, 3),
+                Lat = c.Lat,
+                Lng = c.Lng,
+                CI = c.CI, CoI = c.CoI, AI = c.AI, DI = c.DI,
+                PrimaryBadgeKey = c.PrimaryBadge
+            };
+            foreach (var b in c.SupportingBadges) vm.SupportingBadgeKeys.Add(b);
+            foreach (var r in c.RationaleTokens) vm.RationaleKeys.Add(r);
+            Results.Add(vm);
+        }
+        if (Results.Count > 0) Selected = Results[0];
+    }
 }

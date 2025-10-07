@@ -22,7 +22,35 @@
                     <Label Text="{Binding [Main_LoadingMap], Source={x:Static loc:LocalizationResourceManager.Instance}}" HorizontalOptions="Center" VerticalOptions="Center"/>
                 </Grid>
             </Grid>
-            <CollectionView Grid.Column="1" AutomationId="Main.ResultsList" />
+            <CollectionView Grid.Column="1"
+                            AutomationId="Main.ResultsList"
+                            ItemsSource="{Binding Results}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding Selected}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ResultItemViewModel">
+                        <Grid Padding="8" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" x:Name="ResultItemRoot">
+                            <Grid.AutomationId>
+                                <Binding Path="AutomationId" />
+                            </Grid.AutomationId>
+                            <Label Grid.RowSpan="2" Grid.Column="0" Text="{Binding Rank}" FontAttributes="Bold" />
+                            <Label Grid.Column="1" Text="{Binding Score}" />
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="6">
+                                <Label Text="{Binding PrimaryBadgeKey, Converter={StaticResource ResKeyToTextConverter}}" />
+                                <CollectionView ItemsSource="{Binding SupportingBadgeKeys}" ItemsLayout="HorizontalList">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Frame Padding="4" BackgroundColor="#EEEEEE">
+                                                <Label Text="{Binding ., Converter={StaticResource ResKeyToTextConverter}}" />
+                                            </Frame>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
             <Button Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding [Main_ResetDefaults], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Main.ResetDefaultsButton" Command="{Binding ResetDefaultsCommand}" />
         </Grid>
     </Grid>
