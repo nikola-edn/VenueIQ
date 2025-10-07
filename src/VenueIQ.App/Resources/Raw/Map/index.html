@@ -31,12 +31,39 @@
 
         map.events.add('ready', () => {
           // Placeholder sources/layers
-          const datasource = new atlas.source.DataSource('venueiq-data');
-          map.sources.add(datasource);
-          const heatLayer = new atlas.layer.HeatMapLayer(datasource, 'venueiq-heat');
-          map.layers.add(heatLayer);
-          const symbolLayer = new atlas.layer.SymbolLayer(datasource, 'venueiq-pins');
-          map.layers.add(symbolLayer);
+          window.venueiq = window.venueiq || {};
+          window.venueiq.datasource = new atlas.source.DataSource('venueiq-data');
+          map.sources.add(window.venueiq.datasource);
+          window.venueiq.heatLayer = new atlas.layer.HeatMapLayer(window.venueiq.datasource, 'venueiq-heat', {
+            colorGradient: [
+              'interpolate', ['linear'], ['heatmap-density'],
+              0.0, '#1B4965',
+              0.5, '#5FA8D3',
+              0.8, '#BEE9E8',
+              1.0, '#FFD166'
+            ],
+            weight: ['get', 'score']
+          });
+          map.layers.add(window.venueiq.heatLayer);
+
+          window.venueiq.updateHeatmapB64 = function(b64){
+            try {
+              const json = JSON.parse(atob(b64));
+              const feats = json.features || [];
+              const shapes = feats.map(f => new atlas.Shape(new atlas.data.Point(f.geometry.coordinates), f.properties));
+              window.venueiq.datasource.clear();
+              if (shapes.length > 0) {
+                window.venueiq.datasource.add(shapes);
+              }
+              window.location.href = 'app://mapRendered';
+            } catch (e) {
+              window.location.href = 'app://mapError?' + encodeURIComponent(e.message || 'parse');
+            }
+          };
+          window.venueiq.clearHeatmap = function(){
+            window.venueiq.datasource && window.venueiq.datasource.clear();
+            window.location.href = 'app://mapRendered';
+          };
 
           // Notify host app
           window.location.href = 'app://mapReady';

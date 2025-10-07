@@ -28,6 +28,6 @@ public class MapAnalysisService
             .Select((s, idx) => new ResultItemDto { Address = $"Cell {idx + 1}", Score = s.Score }).ToList();
         sw.Stop();
         // TODO: log sw.Elapsed and flag if > threshold
-        return new AnalysisResultDto { Heatmap = heat, Results = top };
+        return new AnalysisResultDto { Heatmap = heat, Results = top, CellDetails = scores };
     }
 }

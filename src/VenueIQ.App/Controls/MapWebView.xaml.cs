@@ -7,6 +7,7 @@ namespace VenueIQ.App.Controls
         private TaskCompletionSource<bool>? _readyTcs;
         public event EventHandler? MapReady;
         public event EventHandler<string>? MapError;
+        public event EventHandler? HeatmapRendered;
 
         public MapWebView()
         {
@@ -51,6 +52,10 @@ namespace VenueIQ.App.Controls
                     _readyTcs?.TrySetResult(true);
                     MapReady?.Invoke(this, EventArgs.Empty);
                 }
+                else if (host.Equals("maprendered", StringComparison.OrdinalIgnoreCase))
+                {
+                    HeatmapRendered?.Invoke(this, EventArgs.Empty);
+                }
                 else if (host.Equals("maperror", StringComparison.OrdinalIgnoreCase))
                 {
                     var reason = Uri.UnescapeDataString(uri.Query.TrimStart('?'));
@@ -58,6 +63,19 @@ namespace VenueIQ.App.Controls
                     _readyTcs?.TrySetException(new InvalidOperationException(reason));
                 }
             }
+        }
+
+        public async Task UpdateHeatmapAsync(string geoJson, CancellationToken ct = default)
+        {
+            var b64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(geoJson));
+            var js = $"window.venueiq && window.venueiq.updateHeatmapB64 && window.venueiq.updateHeatmapB64('{b64}')";
+            await EvaluateJavaScriptAsync(js).WaitAsync(ct);
+        }
+
+        public Task ClearHeatmapAsync(CancellationToken ct = default)
+        {
+            var js = "window.venueiq && window.venueiq.clearHeatmap && window.venueiq.clearHeatmap()";
+            return EvaluateJavaScriptAsync(js).WaitAsync(ct);
         }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using VenueIQ.App.Helpers;
 using VenueIQ.App.ViewModels;
 using VenueIQ.App.Controls;
+using VenueIQ.App.Services;
+using VenueIQ.App.Utils;
+using VenueIQ.Core.Models;
 
 namespace VenueIQ.App.Views
 {
@@ -20,6 +23,7 @@ namespace VenueIQ.App.Views
                     try
                     {
                         Map.MapReady += (_, ____) => MapLoadingOverlay.IsVisible = false;
+                        Map.HeatmapRendered += (_, ____) => MainThread.BeginInvokeOnMainThread(() => SemanticScreenReader.Announce("Heatmap updated"));
                         Map.MapError += (_, reason) =>
                         {
                             MapLoadingOverlay.IsVisible = false;
@@ -35,6 +39,47 @@ namespace VenueIQ.App.Views
                     }
                 }
             };
+
+            AnalyzeButton.Clicked += async (_, __) => await RunAnalysisAsync();
+        }
+
+        private CancellationTokenSource? _renderCts;
+        private async Task RunAnalysisAsync()
+        {
+            try
+            {
+                _renderCts?.Cancel();
+                _renderCts = new CancellationTokenSource();
+                MapLoadingOverlay.IsVisible = true;
+                var vm = (MainViewModel)BindingContext;
+                var (apiKey, lang) = await vm.GetMapInitAsync();
+                // BusinessType selection TBD; default to Coffee for MVP
+                var input = new AnalysisInput(BusinessType.Coffee, 44.787, 20.449, vm.RadiusKm, lang);
+                var weights = new Weights(vm.WComplements, vm.WAccessibility, vm.WDemand, vm.WCompetition);
+                var analysis = ServiceHost.GetRequiredService<MapAnalysisService>();
+                var res = await analysis.AnalyzeAsync(input, weights, _renderCts.Token);
+                if (res.CellDetails is { Count: > 0 })
+                {
+                    var geo = GeoJsonHelper.BuildFeatureCollection(res.CellDetails);
+                    await Map.UpdateHeatmapAsync(geo, _renderCts.Token);
+                }
+                else
+                {
+                    await Map.ClearHeatmapAsync(_renderCts.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // ignore
+            }
+            catch
+            {
+                // TODO: telemetry
+            }
+            finally
+            {
+                MapLoadingOverlay.IsVisible = false;
+            }
         }
     }
 }
