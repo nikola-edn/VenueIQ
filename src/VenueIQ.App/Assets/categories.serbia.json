@@ -1,0 +1,7 @@
+{
+  "coffee": ["POI_CAFE", "POI_COFFEE_SHOP"],
+  "pharmacy": ["POI_PHARMACY"],
+  "grocery": ["POI_SUPERMARKET", "POI_GROCERY"],
+  "fitness": ["POI_GYM"],
+  "kids_services": ["POI_SCHOOL", "POI_DAYCARE"]
+}

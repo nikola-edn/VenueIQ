@@ -1,0 +1,23 @@
+# Product Requirements Document (PRD)
+
+## Table of Contents
+
+- [Product Requirements Document (PRD)](#table-of-contents)
+  - [Project: VenueIQ](./project-venueiq.md)
+    - [1. Overview](./project-venueiq.md#1-overview)
+    - [2. Goals and Background Context](./project-venueiq.md#2-goals-and-background-context)
+    - [3. Requirements](./project-venueiq.md#3-requirements)
+      - [3.1 Functional Requirements (FR)](./project-venueiq.md#31-functional-requirements-fr)
+      - [3.2 Non‑Functional Requirements (NFR)](./project-venueiq.md#32-nonfunctional-requirements-nfr)
+      - [3.3 Compatibility Requirements (CR)](./project-venueiq.md#33-compatibility-requirements-cr)
+    - [4. User Interface Design Goals](./project-venueiq.md#4-user-interface-design-goals)
+    - [5. Technical Assumptions](./project-venueiq.md#5-technical-assumptions)
+    - [6. Epics and Stories](./project-venueiq.md#6-epics-and-stories)
+      - [Epic 1: Application Setup & Configuration](./project-venueiq.md#epic-1-application-setup-configuration)
+      - [Epic 2: Core Analysis Engine](./project-venueiq.md#epic-2-core-analysis-engine)
+      - [Epic 3: Advanced Interactivity](./project-venueiq.md#epic-3-advanced-interactivity)
+      - [Epic 4: Export & Sharing](./project-venueiq.md#epic-4-export-sharing)
+      - [Epic 5: UX Quality & Explainability](./project-venueiq.md#epic-5-ux-quality-explainability)
+    - [7. Technical Risks](./project-venueiq.md#7-technical-risks)
+    - [8. Success Metrics](./project-venueiq.md#8-success-metrics)
+    - [9. Next Steps](./project-venueiq.md#9-next-steps)

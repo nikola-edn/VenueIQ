@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VenueIQ.App.Views.StartupPage"
+             Title="Startup">
+    <VerticalStackLayout Padding="24" Spacing="16">
+        <Label Text="Enter Azure Maps API Key" />
+        <Entry x:Name="ApiKeyEntry"
+               AutomationId="Startup.ApiKeyEntry"
+               IsPassword="True"
+               Placeholder="Azure Maps API Key" />
+        <HorizontalStackLayout Spacing="12">
+            <Button x:Name="TestButton" Text="Test" AutomationId="Startup.TestButton" />
+            <Button x:Name="SaveButton" Text="Test &amp; Save" AutomationId="Startup.SaveButton" />
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>
