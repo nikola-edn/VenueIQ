@@ -19,6 +19,9 @@ namespace VenueIQ.App
             try
             {
                 var settings = ServiceHost.GetRequiredService<Services.SettingsService>();
+                var localization = ServiceHost.GetRequiredService<Services.LocalizationService>();
+                var lang = await settings.GetLanguageAsync();
+                localization.SetCulture(lang);
                 var key = await settings.GetApiKeyAsync();
                 if (string.IsNullOrWhiteSpace(key))
                 {

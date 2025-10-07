@@ -1,3 +1,6 @@
+using VenueIQ.App.Helpers;
+using VenueIQ.App.ViewModels;
+
 namespace VenueIQ.App.Views
 {
     public partial class SettingsPage : ContentPage
@@ -5,6 +8,9 @@ namespace VenueIQ.App.Views
         public SettingsPage()
         {
             InitializeComponent();
+            var vm = ServiceHost.GetRequiredService<SettingsViewModel>();
+            BindingContext = vm;
+            _ = vm.LoadAsync();
         }
     }
 }
