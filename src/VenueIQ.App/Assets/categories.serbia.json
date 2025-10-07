@@ -1,7 +1,22 @@
 {
-  "coffee": ["POI_CAFE", "POI_COFFEE_SHOP"],
-  "pharmacy": ["POI_PHARMACY"],
-  "grocery": ["POI_SUPERMARKET", "POI_GROCERY"],
-  "fitness": ["POI_GYM"],
-  "kids_services": ["POI_SCHOOL", "POI_DAYCARE"]
+  "coffee": {
+    "competitors": ["POI_CAFE", "POI_COFFEE_SHOP"],
+    "complements": ["POI_PARKING", "POI_PUBLIC_TRANSPORT_STATION"]
+  },
+  "pharmacy": {
+    "competitors": ["POI_PHARMACY"],
+    "complements": ["POI_PARKING", "POI_HOSPITAL"]
+  },
+  "grocery": {
+    "competitors": ["POI_SUPERMARKET", "POI_GROCERY"],
+    "complements": ["POI_PARKING", "POI_PUBLIC_TRANSPORT_STATION"]
+  },
+  "fitness": {
+    "competitors": ["POI_GYM"],
+    "complements": ["POI_PARKING", "POI_CAFE"]
+  },
+  "kids_services": {
+    "competitors": ["POI_SCHOOL", "POI_DAYCARE"],
+    "complements": ["POI_PARKING", "POI_PLAYGROUND"]
+  }
 }

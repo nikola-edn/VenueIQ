@@ -3,6 +3,8 @@ using VenueIQ.App.Services;
 using VenueIQ.App.ViewModels;
 using VenueIQ.Core.Services;
 using VenueIQ.App.Helpers;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace VenueIQ.App
 {
@@ -30,6 +32,12 @@ namespace VenueIQ.App
             builder.Services.AddSingleton<MapAnalysisService>();
             builder.Services.AddSingleton<ScoreCalculator>();
             builder.Services.AddSingleton<ExportService>();
+
+            // POI search dependencies
+            builder.Services.AddMemoryCache();
+            builder.Services.AddSingleton<IPoiCategoryMapProvider, CategoryMapProvider>();
+            builder.Services.AddSingleton<IAzureMapsAuthProvider, AzureMapsAuthProvider>();
+            builder.Services.AddHttpClient<IPoiSearchClient, PoiSearchClient>();
 
             builder.Services.AddTransient<StartupViewModel>();
             builder.Services.AddTransient<MainViewModel>();

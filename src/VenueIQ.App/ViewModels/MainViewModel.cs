@@ -9,7 +9,6 @@ namespace VenueIQ.App.ViewModels;
 public class MainViewModel : INotifyPropertyChanged
 {
     private readonly SettingsService _settings;
-    private readonly PoiSearchService _poi; // reserved for future use
 
     public MainViewModel(SettingsService settings)
     {
