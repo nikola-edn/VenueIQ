@@ -2,6 +2,7 @@
 using VenueIQ.App.Services;
 using VenueIQ.App.ViewModels;
 using VenueIQ.Core.Services;
+using VenueIQ.App.Helpers;
 
 namespace VenueIQ.App
 {
@@ -34,7 +35,9 @@ namespace VenueIQ.App
             builder.Services.AddTransient<MainViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
 
-            return builder.Build();
+            var app = builder.Build();
+            ServiceHost.Services = app.Services;
+            return app;
         }
     }
 }
