@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:VenueIQ.App.ViewModels"
+             xmlns:loc="clr-namespace:VenueIQ.App.Helpers"
              x:Class="VenueIQ.App.Views.MainPage"
              x:DataType="vm:MainViewModel"
              x:Name="MainPageRoot">
@@ -10,13 +11,13 @@
         <Grid x:Name="HeaderBar" ColumnDefinitions="*,Auto,Auto" Row="0" Margin="0,0,0,12">
             <Picker x:Name="BusinessTypePicker" AutomationId="Main.BusinessTypePicker"/>
             <Slider Grid.Column="1" x:Name="RadiusSlider" AutomationId="Main.RadiusSlider" Minimum="0.5" Maximum="5" Value="{Binding RadiusKm}"/>
-            <Button Grid.Column="2" x:Name="AnalyzeButton" AutomationId="Main.AnalyzeButton" Text="Analyze"/>
+            <Button Grid.Column="2" x:Name="AnalyzeButton" AutomationId="Main.AnalyzeButton" Text="{Binding [Main_Analyze], Source={x:Static loc:LocalizationResourceManager.Instance}}"/>
         </Grid>
 
         <Grid Row="1" ColumnDefinitions="2*,*" RowDefinitions="*,Auto" ColumnSpacing="12">
             <ContentView AutomationId="Main.MapHost" BackgroundColor="#EEEEEE" />
             <CollectionView Grid.Column="1" AutomationId="Main.ResultsList" />
-            <Button Grid.Row="1" Grid.ColumnSpan="2" Text="Reset to Defaults" AutomationId="Main.ResetDefaultsButton" Command="{Binding ResetDefaultsCommand}" />
+            <Button Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding [Main_ResetDefaults], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Main.ResetDefaultsButton" Command="{Binding ResetDefaultsCommand}" />
         </Grid>
     </Grid>
 

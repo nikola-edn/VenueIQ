@@ -5,4 +5,17 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="App_Title" xml:space="preserve"><value>VenueIQ</value></data>
+  <data name="Startup_ApiKeyLabel" xml:space="preserve"><value>Unesite Azure Maps API ključ</value></data>
+  <data name="Startup_Placeholder" xml:space="preserve"><value>Azure Maps API ključ</value></data>
+  <data name="Startup_TestAndSave" xml:space="preserve"><value>Testiraj i sačuvaj</value></data>
+  <data name="Startup_Success" xml:space="preserve"><value>Ključ je validiran i sačuvan. Preusmeravanje...</value></data>
+  <data name="Startup_Error_InvalidKey" xml:space="preserve"><value>Nevažeći API ključ. Proverite i pokušajte ponovo.</value></data>
+  <data name="Startup_Error_Connection" xml:space="preserve"><value>Veza nije uspela. Proverite mrežu i pokušajte ponovo.</value></data>
+  <data name="Main_Analyze" xml:space="preserve"><value>Analiziraj</value></data>
+  <data name="Main_ResetDefaults" xml:space="preserve"><value>Vrati na podrazumevano</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Podešavanja</value></data>
+  <data name="Settings_LanguageLabel" xml:space="preserve"><value>Jezik:</value></data>
+  <data name="Settings_RetestApiKey" xml:space="preserve"><value>Ponovo testiraj API ključ</value></data>
+  <data name="Toast_LanguageChanged" xml:space="preserve"><value>Jezik je promenjen.</value></data>
+  <data name="Toast_PrefsReset" xml:space="preserve"><value>Preferencije su vraćene na podrazumevane vrednosti.</value></data>
 </root>

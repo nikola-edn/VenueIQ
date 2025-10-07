@@ -51,7 +51,7 @@ public class StartupViewModel : INotifyPropertyChanged
             var ok = await _poi.TestApiKeyAsync(ApiKey!).ConfigureAwait(false);
             if (!ok)
             {
-                ErrorMessage = "Invalid API key. Please check and try again.";
+                ErrorMessage = Helpers.LocalizationResourceManager.Instance["Startup_Error_InvalidKey"];
                 return;
             }
             await _settings.SetApiKeyAsync(ApiKey!).ConfigureAwait(false);
@@ -63,7 +63,7 @@ public class StartupViewModel : INotifyPropertyChanged
         }
         catch
         {
-            ErrorMessage = "Connection failed. Check network and retry.";
+            ErrorMessage = Helpers.LocalizationResourceManager.Instance["Startup_Error_Connection"];
         }
         finally
         {

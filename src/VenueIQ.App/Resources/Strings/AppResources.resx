@@ -5,4 +5,17 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="App_Title" xml:space="preserve"><value>VenueIQ</value></data>
+  <data name="Startup_ApiKeyLabel" xml:space="preserve"><value>Enter Azure Maps API Key</value></data>
+  <data name="Startup_Placeholder" xml:space="preserve"><value>Azure Maps API Key</value></data>
+  <data name="Startup_TestAndSave" xml:space="preserve"><value>Test &amp; Save</value></data>
+  <data name="Startup_Success" xml:space="preserve"><value>Key validated and saved. Redirecting...</value></data>
+  <data name="Startup_Error_InvalidKey" xml:space="preserve"><value>Invalid API key. Please check and try again.</value></data>
+  <data name="Startup_Error_Connection" xml:space="preserve"><value>Connection failed. Check network and retry.</value></data>
+  <data name="Main_Analyze" xml:space="preserve"><value>Analyze</value></data>
+  <data name="Main_ResetDefaults" xml:space="preserve"><value>Reset to Defaults</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings_LanguageLabel" xml:space="preserve"><value>Language:</value></data>
+  <data name="Settings_RetestApiKey" xml:space="preserve"><value>Retest API Key</value></data>
+  <data name="Toast_LanguageChanged" xml:space="preserve"><value>Language changed.</value></data>
+  <data name="Toast_PrefsReset" xml:space="preserve"><value>Preferences reset to defaults.</value></data>
 </root>

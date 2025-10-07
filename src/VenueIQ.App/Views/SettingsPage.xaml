@@ -2,17 +2,18 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:VenueIQ.App.ViewModels"
+             xmlns:loc="clr-namespace:VenueIQ.App.Helpers"
              x:Class="VenueIQ.App.Views.SettingsPage"
              x:DataType="vm:SettingsViewModel"
-             Title="Settings">
+             Title="{Binding [Settings_Title], Source={x:Static loc:LocalizationResourceManager.Instance}}">
     <VerticalStackLayout Padding="24" Spacing="16">
-        <Label Text="Settings" />
+        <Label Text="{Binding [Settings_Title], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
         <HorizontalStackLayout>
-            <Label Text="Language:" />
+            <Label Text="{Binding [Settings_LanguageLabel], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
             <Picker AutomationId="Settings.LanguagePicker"
                     ItemsSource="{Binding Languages}"
                     SelectedItem="{Binding Language}" />
         </HorizontalStackLayout>
-        <Button Text="Retest API Key" AutomationId="Settings.RetestApiKeyButton" />
+        <Button Text="{Binding [Settings_RetestApiKey], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Settings.RetestApiKeyButton" />
     </VerticalStackLayout>
 </ContentPage>

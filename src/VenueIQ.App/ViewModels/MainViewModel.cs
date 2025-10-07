@@ -41,7 +41,7 @@ public class MainViewModel : INotifyPropertyChanged
         WComplements = 0.35; WAccessibility = 0.25; WDemand = 0.25; WCompetition = 0.35;
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
-            SemanticScreenReader.Announce("Preferences reset to defaults.");
+            SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Toast_PrefsReset"]);
         });
     }
 

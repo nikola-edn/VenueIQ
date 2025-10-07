@@ -59,16 +59,33 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
-		<!-- Optional: MVVM toolkit can be added in later stories -->
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
+        <!-- Optional: MVVM toolkit can be added in later stories -->
+    </ItemGroup>
 
 	<!-- Include assets folder for data files -->
-	<ItemGroup>
-		<MauiAsset Include="Assets\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-	</ItemGroup>
+    <ItemGroup>
+        <MauiAsset Include="Assets\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <!-- Strongly-typed resources for AppResources -->
+    <ItemGroup>
+        <EmbeddedResource Update="Resources\Strings\AppResources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+            <CustomToolNamespace>VenueIQ.App.Resources.Strings</CustomToolNamespace>
+        </EmbeddedResource>
+        <Compile Update="Resources\Strings\AppResources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>AppResources.resx</DependentUpon>
+        </Compile>
+        <EmbeddedResource Update="Resources\Strings\AppResources.sr-Latn.resx">
+            <DependentUpon>AppResources.resx</DependentUpon>
+        </EmbeddedResource>
+    </ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\\VenueIQ.Core\\VenueIQ.Core.csproj" />

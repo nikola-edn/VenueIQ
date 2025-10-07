@@ -2,29 +2,30 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:VenueIQ.App.ViewModels"
+             xmlns:loc="clr-namespace:VenueIQ.App.Helpers"
              x:Class="VenueIQ.App.Views.StartupPage"
              x:DataType="vm:StartupViewModel"
              Title="Startup">
     <VerticalStackLayout Padding="24" Spacing="16">
-        <Label Text="Enter Azure Maps API Key" />
+        <Label Text="{Binding [Startup_ApiKeyLabel], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
         <Entry x:Name="ApiKeyEntry"
                AutomationId="Startup.ApiKeyEntry"
                IsPassword="True"
                Text="{Binding ApiKey}"
-               Placeholder="Azure Maps API Key" />
+               Placeholder="{Binding [Startup_Placeholder], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
 
         <ActivityIndicator IsRunning="{Binding IsBusy}"
                            IsVisible="{Binding IsBusy}" />
 
         <Border BackgroundColor="#E8F5E9" Stroke="#C8E6C9" Padding="8" IsVisible="{Binding IsSuccess}">
-            <Label Text="Key validated and saved. Redirecting..." />
+            <Label Text="{Binding [Startup_Success], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
         </Border>
 
         <Border BackgroundColor="#FFEBEE" Stroke="#FFCDD2" Padding="8" IsVisible="{Binding HasError}">
             <Label Text="{Binding ErrorMessage}" />
         </Border>
 
-        <Button Text="Test &amp; Save"
+        <Button Text="{Binding [Startup_TestAndSave], Source={x:Static loc:LocalizationResourceManager.Instance}}"
                 AutomationId="Startup.TestAndSaveButton"
                 Command="{Binding TestAndSaveCommand}" />
     </VerticalStackLayout>

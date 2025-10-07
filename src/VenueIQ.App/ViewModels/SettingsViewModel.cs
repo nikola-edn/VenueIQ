@@ -25,6 +25,10 @@ public class SettingsViewModel : INotifyPropertyChanged
             _language = value; OnPropertyChanged();
             _ = _settings.SetLanguageAsync(value);
             _localization.SetCulture(value);
+            _ = MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Toast_LanguageChanged"]);
+            });
         }
     }
 
