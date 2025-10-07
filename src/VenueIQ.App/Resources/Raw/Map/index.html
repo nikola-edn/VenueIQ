@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VenueIQ Map</title>
+  <style>
+    html, body, #map { height:100%; margin:0; padding:0; }
+    #legend { position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.9); border-radius:8px; padding:8px 10px; box-shadow:0 2px 6px rgba(0,0,0,0.15); font-family:sans-serif; }
+  </style>
+  <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css" />
+  <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js"></script>
+</head>
+<body>
+  <div id="map" role="application" aria-label="Azure map"></div>
+  <div id="legend" aria-label="Legend">Legend (placeholder)</div>
+  <script>
+    (function(){
+      const subKey = '{{API_KEY}}';
+      const lang = '{{LANG}}' || 'sr-Latn';
+      const center = [parseFloat('{{CENTER_LNG}}'), parseFloat('{{CENTER_LAT}}')];
+      const zoom = parseInt('{{ZOOM}}') || 11;
+
+      try {
+        const map = new atlas.Map('map', {
+          language: lang,
+          center: center,
+          zoom: zoom,
+          authOptions: { authType: 'subscriptionKey', subscriptionKey: subKey }
+        });
+
+        map.events.add('ready', () => {
+          // Placeholder sources/layers
+          const datasource = new atlas.source.DataSource('venueiq-data');
+          map.sources.add(datasource);
+          const heatLayer = new atlas.layer.HeatMapLayer(datasource, 'venueiq-heat');
+          map.layers.add(heatLayer);
+          const symbolLayer = new atlas.layer.SymbolLayer(datasource, 'venueiq-pins');
+          map.layers.add(symbolLayer);
+
+          // Notify host app
+          window.location.href = 'app://mapReady';
+        });
+      } catch (err) {
+        const reason = encodeURIComponent((err && err.message) ? err.message : 'unknown');
+        window.location.href = 'app://mapError?' + reason;
+      }
+    })();
+  </script>
+</body>
+</html>

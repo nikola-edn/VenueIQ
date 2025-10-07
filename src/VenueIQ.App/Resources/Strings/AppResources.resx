@@ -18,4 +18,5 @@
   <data name="Settings_RetestApiKey" xml:space="preserve"><value>Retest API Key</value></data>
   <data name="Toast_LanguageChanged" xml:space="preserve"><value>Language changed.</value></data>
   <data name="Toast_PrefsReset" xml:space="preserve"><value>Preferences reset to defaults.</value></data>
+  <data name="Main_LoadingMap" xml:space="preserve"><value>Loading map...</value></data>
 </root>

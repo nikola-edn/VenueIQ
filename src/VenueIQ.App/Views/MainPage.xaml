@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:VenueIQ.App.ViewModels"
              xmlns:loc="clr-namespace:VenueIQ.App.Helpers"
+             xmlns:controls="clr-namespace:VenueIQ.App.Controls"
              x:Class="VenueIQ.App.Views.MainPage"
              x:DataType="vm:MainViewModel"
              x:Name="MainPageRoot">
@@ -15,7 +16,12 @@
         </Grid>
 
         <Grid Row="1" ColumnDefinitions="2*,*" RowDefinitions="*,Auto" ColumnSpacing="12">
-            <ContentView AutomationId="Main.MapHost" BackgroundColor="#EEEEEE" />
+            <Grid>
+                <controls:MapWebView x:Name="Map" />
+                <Grid x:Name="MapLoadingOverlay" AutomationId="Main.MapLoadingOverlay" BackgroundColor="#66000000" IsVisible="True">
+                    <Label Text="{Binding [Main_LoadingMap], Source={x:Static loc:LocalizationResourceManager.Instance}}" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Grid>
+            </Grid>
             <CollectionView Grid.Column="1" AutomationId="Main.ResultsList" />
             <Button Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding [Main_ResetDefaults], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Main.ResetDefaultsButton" Command="{Binding ResetDefaultsCommand}" />
         </Grid>

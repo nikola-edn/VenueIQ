@@ -18,4 +18,5 @@
   <data name="Settings_RetestApiKey" xml:space="preserve"><value>Ponovo testiraj API ključ</value></data>
   <data name="Toast_LanguageChanged" xml:space="preserve"><value>Jezik je promenjen.</value></data>
   <data name="Toast_PrefsReset" xml:space="preserve"><value>Preferencije su vraćene na podrazumevane vrednosti.</value></data>
+  <data name="Main_LoadingMap" xml:space="preserve"><value>Učitavanje mape...</value></data>
 </root>

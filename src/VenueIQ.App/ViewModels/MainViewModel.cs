@@ -9,6 +9,7 @@ namespace VenueIQ.App.ViewModels;
 public class MainViewModel : INotifyPropertyChanged
 {
     private readonly SettingsService _settings;
+    private readonly PoiSearchService _poi; // reserved for future use
 
     public MainViewModel(SettingsService settings)
     {
@@ -50,6 +51,13 @@ public class MainViewModel : INotifyPropertyChanged
         RadiusKm = await _settings.GetRadiusKmAsync().ConfigureAwait(false);
         var w = await _settings.GetWeightsAsync().ConfigureAwait(false);
         WComplements = w.complements; WAccessibility = w.accessibility; WDemand = w.demand; WCompetition = w.competition;
+    }
+
+    public async Task<(string apiKey, string language)> GetMapInitAsync()
+    {
+        var key = await _settings.GetApiKeyAsync().ConfigureAwait(false) ?? string.Empty;
+        var lang = await _settings.GetLanguageAsync().ConfigureAwait(false);
+        return (key, lang);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
