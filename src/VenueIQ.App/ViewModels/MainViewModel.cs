@@ -5,6 +5,7 @@ using VenueIQ.App.Services;
 using VenueIQ.App.Utils;
 using System.Collections.ObjectModel;
 using VenueIQ.Core.Models;
+using VenueIQ.Core.Utils;
 
 namespace VenueIQ.App.ViewModels;
 
@@ -16,6 +17,7 @@ public class MainViewModel : INotifyPropertyChanged
     {
         _settings = settings;
         ResetDefaultsCommand = new AsyncCommand(ResetDefaultsAsync);
+        AutoBalanceCommand = new AsyncCommand(AutoBalanceAsync);
     }
 
     private double _radiusKm = 2.0;
@@ -34,16 +36,64 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void PersistWeights() => _ = _settings.SetWeightsAsync(WComplements, WAccessibility, WDemand, WCompetition);
 
+    // Advanced weights panel state
+    private bool _isDraggingWeights;
+    public bool IsDraggingWeights
+    {
+        get => _isDraggingWeights;
+        private set
+        {
+            if (_isDraggingWeights != value)
+            {
+                _isDraggingWeights = value;
+                OnPropertyChanged();
+                IsAnalyzeEnabled = !value;
+            }
+        }
+    }
+    private bool _isAnalyzeEnabled = true;
+    public bool IsAnalyzeEnabled { get => _isAnalyzeEnabled; private set { if (_isAnalyzeEnabled != value) { _isAnalyzeEnabled = value; OnPropertyChanged(); } } }
+
+    // Percent-facing properties for UI (0-100)
+    private double _wComplementsPercent = 35, _wAccessibilityPercent = 25, _wDemandPercent = 25, _wCompetitionPercent = 35;
+    public double WComplementsPercent { get => _wComplementsPercent; set { if (Math.Abs(_wComplementsPercent - value) > 0.0001) { _wComplementsPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); } } }
+    public double WAccessibilityPercent { get => _wAccessibilityPercent; set { if (Math.Abs(_wAccessibilityPercent - value) > 0.0001) { _wAccessibilityPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); } } }
+    public double WDemandPercent { get => _wDemandPercent; set { if (Math.Abs(_wDemandPercent - value) > 0.0001) { _wDemandPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); } } }
+    public double WCompetitionPercent { get => _wCompetitionPercent; set { if (Math.Abs(_wCompetitionPercent - value) > 0.0001) { _wCompetitionPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); } } }
+
+    private void RecomputeNormalizedWeights()
+    {
+        var (c, a, d, q) = WeightsHelper.FromPercentages(WComplementsPercent, WAccessibilityPercent, WDemandPercent, WCompetitionPercent);
+        WComplements = c; WAccessibility = a; WDemand = d; WCompetition = q;
+    }
+
+    public void SetWeightsDragging(bool dragging) => IsDraggingWeights = dragging;
+
     public ICommand ResetDefaultsCommand { get; }
+    public ICommand AutoBalanceCommand { get; }
 
     private async Task ResetDefaultsAsync()
     {
         await _settings.ResetToDefaultsAsync().ConfigureAwait(false);
         RadiusKm = 2.0;
-        WComplements = 0.35; WAccessibility = 0.25; WDemand = 0.25; WCompetition = 0.35;
+        // Reset UI-facing percents then recompute normalized decimals
+        WComplementsPercent = 35; WAccessibilityPercent = 25; WDemandPercent = 25; WCompetitionPercent = 35;
+        RecomputeNormalizedWeights();
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
             SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Toast_PrefsReset"]);
+        });
+    }
+
+    private async Task AutoBalanceAsync()
+    {
+        // Reset to default percentages and normalize
+        WComplementsPercent = 35; WAccessibilityPercent = 25; WDemandPercent = 25; WCompetitionPercent = 35;
+        RecomputeNormalizedWeights();
+        try { Microsoft.Maui.Devices.HapticFeedback.Default.Perform(Microsoft.Maui.Devices.HapticFeedbackType.Click); } catch { /* ignore */ }
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Weights_AutoBalanced"]);
         });
     }
 
@@ -52,6 +102,19 @@ public class MainViewModel : INotifyPropertyChanged
         RadiusKm = await _settings.GetRadiusKmAsync().ConfigureAwait(false);
         var w = await _settings.GetWeightsAsync().ConfigureAwait(false);
         WComplements = w.complements; WAccessibility = w.accessibility; WDemand = w.demand; WCompetition = w.competition;
+        // Initialize percent UI from persisted decimals
+        var pos = WComplements + WAccessibility + WDemand;
+        if (pos <= 1e-9)
+        {
+            WComplementsPercent = 35; WAccessibilityPercent = 25; WDemandPercent = 25; WCompetitionPercent = WCompetition / 0.35 * 100.0;
+        }
+        else
+        {
+            WComplementsPercent = Math.Round(WComplements / pos * 100.0);
+            WAccessibilityPercent = Math.Round(WAccessibility / pos * 100.0);
+            WDemandPercent = Math.Round(WDemand / pos * 100.0);
+            WCompetitionPercent = Math.Round(WCompetition * 100.0);
+        }
     }
 
     public async Task<(string apiKey, string language)> GetMapInitAsync()

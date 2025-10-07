@@ -42,6 +42,17 @@ namespace VenueIQ.App.Views
 
             AnalyzeButton.Clicked += async (_, __) => await RunAnalysisAsync();
             ResultsList_SelectionSetup();
+
+            // Sliders drag state: disable Analyze while dragging
+            void HookSlider(Slider s)
+            {
+                s.DragStarted += (_, __) => vm.SetWeightsDragging(true);
+                s.DragCompleted += (_, __) => vm.SetWeightsDragging(false);
+            }
+            HookSlider(ComplementsSlider);
+            HookSlider(AccessibilitySlider);
+            HookSlider(DemandSlider);
+            HookSlider(CompetitionSlider);
         }
 
         private CancellationTokenSource? _renderCts;

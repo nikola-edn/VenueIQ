@@ -19,6 +19,18 @@
   <data name="Toast_LanguageChanged" xml:space="preserve"><value>Language changed.</value></data>
   <data name="Toast_PrefsReset" xml:space="preserve"><value>Preferences reset to defaults.</value></data>
   <data name="Main_LoadingMap" xml:space="preserve"><value>Loading map...</value></data>
+  <data name="Main_AdvancedWeights" xml:space="preserve"><value>Advanced Weights</value></data>
+  <data name="Weights_Complements" xml:space="preserve"><value>Complements</value></data>
+  <data name="Weights_Accessibility" xml:space="preserve"><value>Accessibility</value></data>
+  <data name="Weights_Demand" xml:space="preserve"><value>Demand</value></data>
+  <data name="Weights_Competition" xml:space="preserve"><value>Competition</value></data>
+  <data name="Weights_AutoBalance" xml:space="preserve"><value>Auto-balance</value></data>
+  <data name="Weights_AutoBalanced" xml:space="preserve"><value>Weights reset to defaults.</value></data>
+  <data name="Weights_Toggle" xml:space="preserve"><value>Toggle weights</value></data>
+  <data name="A11y_Weights_Complements" xml:space="preserve"><value>Set complements weight. Higher increases influence of complementary places.</value></data>
+  <data name="A11y_Weights_Accessibility" xml:space="preserve"><value>Set accessibility weight. Higher emphasizes parking and transit access.</value></data>
+  <data name="A11y_Weights_Demand" xml:space="preserve"><value>Set demand weight. Higher emphasizes schools, offices, and apartments.</value></data>
+  <data name="A11y_Weights_Competition" xml:space="preserve"><value>Set competition weight. Higher reduces overall score where competition is strong.</value></data>
   <data name="badge_high_competition" xml:space="preserve"><value>High competition</value></data>
   <data name="badge_strong_complements" xml:space="preserve"><value>Strong complements</value></data>
   <data name="badge_good_access" xml:space="preserve"><value>Good access</value></data>

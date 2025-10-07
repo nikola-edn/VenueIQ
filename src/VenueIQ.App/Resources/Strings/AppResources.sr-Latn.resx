@@ -19,6 +19,18 @@
   <data name="Toast_LanguageChanged" xml:space="preserve"><value>Jezik je promenjen.</value></data>
   <data name="Toast_PrefsReset" xml:space="preserve"><value>Preferencije su vraćene na podrazumevane vrednosti.</value></data>
   <data name="Main_LoadingMap" xml:space="preserve"><value>Učitavanje mape...</value></data>
+  <data name="Main_AdvancedWeights" xml:space="preserve"><value>Napredne težine</value></data>
+  <data name="Weights_Complements" xml:space="preserve"><value>Komplementi</value></data>
+  <data name="Weights_Accessibility" xml:space="preserve"><value>Pristupačnost</value></data>
+  <data name="Weights_Demand" xml:space="preserve"><value>Potražnja</value></data>
+  <data name="Weights_Competition" xml:space="preserve"><value>Konkurencija</value></data>
+  <data name="Weights_AutoBalance" xml:space="preserve"><value>Auto-balans</value></data>
+  <data name="Weights_AutoBalanced" xml:space="preserve"><value>Težine su vraćene na podrazumevane.</value></data>
+  <data name="Weights_Toggle" xml:space="preserve"><value>Prikaži/sakrij težine</value></data>
+  <data name="A11y_Weights_Complements" xml:space="preserve"><value>Podesite težinu komplementa. Veća vrednost povećava uticaj komplementarnih mesta.</value></data>
+  <data name="A11y_Weights_Accessibility" xml:space="preserve"><value>Podesite težinu pristupačnosti. Veća vrednost naglašava parking i javni prevoz.</value></data>
+  <data name="A11y_Weights_Demand" xml:space="preserve"><value>Podesite težinu potražnje. Veća vrednost naglašava škole, kancelarije i stanove.</value></data>
+  <data name="A11y_Weights_Competition" xml:space="preserve"><value>Podesite težinu konkurencije. Veća vrednost smanjuje ukupni skor gde je konkurencija jaka.</value></data>
   <data name="badge_high_competition" xml:space="preserve"><value>Visoka konkurencija</value></data>
   <data name="badge_strong_complements" xml:space="preserve"><value>Jaki komplementarni objekti</value></data>
   <data name="badge_good_access" xml:space="preserve"><value>Dobra pristupačnost</value></data>
