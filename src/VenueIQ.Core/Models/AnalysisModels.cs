@@ -33,3 +33,19 @@ public class PoiSearchResult
     public PoiSearchMetadata Meta { get; set; } = new();
 }
 
+public record Weights(double Complements, double Accessibility, double Demand, double Competition);
+
+public class CellScore
+{
+    public double Lat { get; set; }
+    public double Lng { get; set; }
+    public double CI { get; set; }
+    public double CoI { get; set; }
+    public double AI { get; set; }
+    public double DI { get; set; }
+    public double Score { get; set; }
+    public string? PrimaryBadge { get; set; }
+    public List<string> SupportingBadges { get; set; } = new();
+    public List<string> RationaleTokens { get; set; } = new();
+    public double CoverageConfidence { get; set; }
+}
