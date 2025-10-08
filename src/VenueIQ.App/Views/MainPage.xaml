@@ -9,11 +9,12 @@
              x:Name="MainPageRoot">
 
     <Grid RowDefinitions="Auto,*" Padding="16">
-            <Grid x:Name="HeaderBar" ColumnDefinitions="*,Auto,Auto,Auto" Row="0" Margin="0,0,0,12">
+            <Grid x:Name="HeaderBar" ColumnDefinitions="*,Auto,Auto,Auto,Auto" Row="0" Margin="0,0,0,12">
             <Picker x:Name="BusinessTypePicker" AutomationId="Main.BusinessTypePicker"/>
             <Slider Grid.Column="1" x:Name="RadiusSlider" AutomationId="Main.RadiusSlider" Minimum="0.5" Maximum="5" Value="{Binding RadiusKm}"/>
             <Button Grid.Column="2" x:Name="AnalyzeButton" AutomationId="Main.AnalyzeButton" Text="{Binding [Main_Analyze], Source={x:Static loc:LocalizationResourceManager.Instance}}" IsEnabled="{Binding IsAnalyzeEnabled}"/>
             <Button Grid.Column="3" x:Name="ExportButton" AutomationId="Main.ExportButton" Text="{Binding [Export_Heatmap], Source={x:Static loc:LocalizationResourceManager.Instance}}"/>
+            <Button Grid.Column="4" x:Name="ExportPdfButton" AutomationId="Main.ExportPdfButton" Text="{Binding [Export_Pdf], Source={x:Static loc:LocalizationResourceManager.Instance}}"/>
         </Grid>
 
         <Grid Row="1" ColumnDefinitions="2*,*" RowDefinitions="Auto,*,Auto" ColumnSpacing="12">
@@ -161,6 +162,60 @@
                         <Label Grid.Column="0" />
                         <Button Grid.Column="1" x:Name="CancelExportButton" Text="{Binding [Export_Cancel], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
                         <Button Grid.Column="2" x:Name="SaveExportButton" AutomationId="ExportHeatmap.SaveButton" Text="{Binding [Export_Save], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+
+        <!-- Export PDF Dialog Overlay -->
+        <Grid x:Name="ExportPdfDialogOverlay" Grid.RowSpan="2" BackgroundColor="#66000000" IsVisible="False" AutomationId="ExportPdf.Dialog">
+            <Frame Padding="16" CornerRadius="10" HasShadow="True" WidthRequest="580" HorizontalOptions="Center" VerticalOptions="Center" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#2B2B2B}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="{Binding [ExportPdf_Dialog_Title], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" FontSize="18" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                        <VerticalStackLayout Grid.Column="0" Spacing="8">
+                            <Label Text="{Binding [ExportPdf_Language_Label], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                            <Picker x:Name="ExportPdfLanguagePicker" AutomationId="ExportPdf.LanguagePicker">
+                                <Picker.Items>
+                                    <x:String>sr-Latn</x:String>
+                                    <x:String>en</x:String>
+                                </Picker.Items>
+                                <Picker.SelectedIndex>0</Picker.SelectedIndex>
+                            </Picker>
+
+                            <Label Text="{Binding [ExportPdf_Orientation_Label], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                            <HorizontalStackLayout>
+                                <RadioButton x:Name="ExportPdfPortrait" Content="{Binding [ExportPdf_Orientation_Portrait], Source={x:Static loc:LocalizationResourceManager.Instance}}" GroupName="PdfOrientation" IsChecked="True" />
+                                <RadioButton x:Name="ExportPdfLandscape" Content="{Binding [ExportPdf_Orientation_Landscape], Source={x:Static loc:LocalizationResourceManager.Instance}}" GroupName="PdfOrientation" />
+                            </HorizontalStackLayout>
+
+                            <Label Text="{Binding [ExportPdf_Include_Label], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                            <VerticalStackLayout>
+                                <CheckBox x:Name="ExportPdfIncludeThumbnails" IsChecked="True" />
+                                <Label Text="{Binding [ExportPdf_Include_Thumbnails], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                                <CheckBox x:Name="ExportPdfIncludePoiTables" IsChecked="True" />
+                                <Label Text="{Binding [ExportPdf_Include_PoiTables], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                                <CheckBox x:Name="ExportPdfIncludeMethodology" IsChecked="True" />
+                                <Label Text="{Binding [ExportPdf_Include_Methodology], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                                <CheckBox x:Name="ExportPdfIncludeExecSummary" />
+                                <Label Text="{Binding [ExportPdf_Include_ExecSummary], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="{Binding [ExportPdf_Preview_Note], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                            <Frame Padding="0" BorderColor="#DDD" BackgroundColor="#FFF" HeightRequest="180">
+                                <Image x:Name="ExportPdfCoverPreview" Aspect="AspectFill"/>
+                            </Frame>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Label x:Name="ExportPdfProgressLabel" TextColor="#666" IsVisible="False" />
+
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" />
+                        <Button Grid.Column="1" x:Name="CancelExportPdfButton" Text="{Binding [Export_Cancel], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                        <Button Grid.Column="2" x:Name="SaveExportPdfButton" AutomationId="ExportPdf.SaveButton" Text="{Binding [Export_Save], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
                     </Grid>
                 </VerticalStackLayout>
             </Frame>

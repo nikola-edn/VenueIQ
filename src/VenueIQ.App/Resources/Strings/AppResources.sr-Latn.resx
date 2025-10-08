@@ -62,4 +62,19 @@
   <data name="Export_Success" xml:space="preserve"><value>Sačuvano u {0}</value></data>
   <data name="Export_Success_A11y" xml:space="preserve"><value>Izvoz je završen.</value></data>
   <data name="Export_Error" xml:space="preserve"><value>Izvoz nije uspeo. Pokušajte ponovo.</value></data>
+  <data name="Export_Pdf" xml:space="preserve"><value>Izveštaj</value></data>
+  <data name="ExportPdf_Dialog_Title" xml:space="preserve"><value>Izvoz PDF izveštaja</value></data>
+  <data name="ExportPdf_Language_Label" xml:space="preserve"><value>Jezik</value></data>
+  <data name="ExportPdf_Orientation_Label" xml:space="preserve"><value>Orientacija</value></data>
+  <data name="ExportPdf_Orientation_Portrait" xml:space="preserve"><value>Uspravno</value></data>
+  <data name="ExportPdf_Orientation_Landscape" xml:space="preserve"><value>Položeno</value></data>
+  <data name="ExportPdf_Include_Label" xml:space="preserve"><value>Uključi</value></data>
+  <data name="ExportPdf_Include_Thumbnails" xml:space="preserve"><value>Umanjene mape</value></data>
+  <data name="ExportPdf_Include_PoiTables" xml:space="preserve"><value>POI tabele</value></data>
+  <data name="ExportPdf_Include_Methodology" xml:space="preserve"><value>Metodologiju</value></data>
+  <data name="ExportPdf_Include_ExecSummary" xml:space="preserve"><value>Rezime za rukovodstvo</value></data>
+  <data name="ExportPdf_Preview_Note" xml:space="preserve"><value>Pregled naslovne</value></data>
+  <data name="ExportPdf_Building" xml:space="preserve"><value>Generisanje PDF-a…</value></data>
+  <data name="ExportPdf_Success_A11y" xml:space="preserve"><value>PDF izvoz je završen.</value></data>
+  <data name="ExportPdf_Error" xml:space="preserve"><value>Izvoz PDF-a nije uspeo.</value></data>
 </root>

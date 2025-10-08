@@ -62,4 +62,19 @@
   <data name="Export_Success" xml:space="preserve"><value>Saved to {0}</value></data>
   <data name="Export_Success_A11y" xml:space="preserve"><value>Export completed.</value></data>
   <data name="Export_Error" xml:space="preserve"><value>Export failed. Please try again.</value></data>
+  <data name="Export_Pdf" xml:space="preserve"><value>Report</value></data>
+  <data name="ExportPdf_Dialog_Title" xml:space="preserve"><value>Export PDF Report</value></data>
+  <data name="ExportPdf_Language_Label" xml:space="preserve"><value>Language</value></data>
+  <data name="ExportPdf_Orientation_Label" xml:space="preserve"><value>Orientation</value></data>
+  <data name="ExportPdf_Orientation_Portrait" xml:space="preserve"><value>Portrait</value></data>
+  <data name="ExportPdf_Orientation_Landscape" xml:space="preserve"><value>Landscape</value></data>
+  <data name="ExportPdf_Include_Label" xml:space="preserve"><value>Include</value></data>
+  <data name="ExportPdf_Include_Thumbnails" xml:space="preserve"><value>Map thumbnails</value></data>
+  <data name="ExportPdf_Include_PoiTables" xml:space="preserve"><value>POI tables</value></data>
+  <data name="ExportPdf_Include_Methodology" xml:space="preserve"><value>Methodology section</value></data>
+  <data name="ExportPdf_Include_ExecSummary" xml:space="preserve"><value>Executive summary</value></data>
+  <data name="ExportPdf_Preview_Note" xml:space="preserve"><value>Cover preview</value></data>
+  <data name="ExportPdf_Building" xml:space="preserve"><value>Generating PDF…</value></data>
+  <data name="ExportPdf_Success_A11y" xml:space="preserve"><value>PDF export completed.</value></data>
+  <data name="ExportPdf_Error" xml:space="preserve"><value>PDF export failed.</value></data>
 </root>

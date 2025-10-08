@@ -43,6 +43,7 @@ namespace VenueIQ.App.Views
 
             AnalyzeButton.Clicked += async (_, __) => await RunAnalysisAsync();
             ExportButton.Clicked += async (_, __) => await OpenExportDialogAsync();
+            ExportPdfButton.Clicked += async (_, __) => await OpenExportPdfDialogAsync();
             ResultsList_SelectionSetup();
 
             // Sliders drag state: disable Analyze while dragging
@@ -165,6 +166,101 @@ namespace VenueIQ.App.Views
             finally
             {
                 SaveExportButton.IsEnabled = true;
+            }
+        }
+
+        private async Task OpenExportPdfDialogAsync()
+        {
+            try
+            {
+                ExportPdfDialogOverlay.IsVisible = true;
+                ExportPdfProgressLabel.IsVisible = true;
+                ExportPdfProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["Export_Preview_Loading"];
+                await Task.Yield();
+                var preview = await Map.CaptureImageAsync("png", 0.5);
+                if (preview is not null)
+                {
+                    ExportPdfCoverPreview.Source = ImageSource.FromStream(() => new MemoryStream(preview));
+                    ExportPdfProgressLabel.IsVisible = false;
+                    MainThread.BeginInvokeOnMainThread(() =>
+                        SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Export_Preview_Ready"]))
+                    ;
+                }
+                else
+                {
+                    ExportPdfProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["Export_Preview_Unavailable"];
+                }
+            }
+            catch
+            {
+                ExportPdfProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["Export_Preview_Unavailable"];
+            }
+
+            CancelExportPdfButton.Clicked -= CancelExportPdfButton_Clicked;
+            CancelExportPdfButton.Clicked += CancelExportPdfButton_Clicked;
+            SaveExportPdfButton.Clicked -= SaveExportPdfButton_Clicked;
+            SaveExportPdfButton.Clicked += SaveExportPdfButton_Clicked;
+        }
+
+        private void CancelExportPdfButton_Clicked(object? sender, EventArgs e)
+        {
+            ExportPdfDialogOverlay.IsVisible = false;
+            ExportPdfCoverPreview.Source = null;
+            ExportPdfProgressLabel.IsVisible = false;
+        }
+
+        private async void SaveExportPdfButton_Clicked(object? sender, EventArgs e)
+        {
+            try
+            {
+                SaveExportPdfButton.IsEnabled = false;
+                ExportPdfProgressLabel.IsVisible = true;
+                ExportPdfProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["ExportPdf_Building"];
+                MainThread.BeginInvokeOnMainThread(() =>
+                    SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["ExportPdf_Building"]))
+                ;
+
+                var vm = (MainViewModel)BindingContext;
+                var weights = (vm.WComplements, vm.WAccessibility, vm.WDemand, vm.WCompetition);
+                var business = "Coffee"; // TODO: bind from picker when wired
+                var opts = new PdfExportOptions
+                {
+                    Language = ExportPdfLanguagePicker.SelectedIndex == 1 ? "en" : "sr-Latn",
+                    Orientation = ExportPdfLandscape.IsChecked ? "Landscape" : "Portrait",
+                    IncludeMapThumbnails = ExportPdfIncludeThumbnails.IsChecked == true,
+                    IncludePoiTables = ExportPdfIncludePoiTables.IsChecked == true,
+                    IncludeMethodology = ExportPdfIncludeMethodology.IsChecked == true,
+                    IncludeExecutiveSummary = ExportPdfIncludeExecSummary.IsChecked == true,
+                    MaxResults = 10
+                };
+                var progress = new Progress<string>(key =>
+                {
+                    ExportPdfProgressLabel.Text = Helpers.LocalizationResourceManager.Instance[key];
+                });
+                var export = ServiceHost.GetRequiredService<ExportService>();
+                var path = await export.ExportResultsPdfAsync(Map, vm.Results, weights, vm.RadiusKm, business, opts, progress);
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    ExportPdfProgressLabel.Text = string.Format(Helpers.LocalizationResourceManager.Instance["Export_Success"], path);
+                    MainThread.BeginInvokeOnMainThread(() =>
+                        SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["ExportPdf_Success_A11y"]))
+                    ;
+                }
+                else
+                {
+                    ExportPdfProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["ExportPdf_Error"];
+                    MainThread.BeginInvokeOnMainThread(() =>
+                        SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["ExportPdf_Error"]))
+                    ;
+                }
+            }
+            catch
+            {
+                ExportPdfProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["ExportPdf_Error"];
+            }
+            finally
+            {
+                SaveExportPdfButton.IsEnabled = true;
             }
         }
 
