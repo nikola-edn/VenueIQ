@@ -53,6 +53,33 @@ namespace VenueIQ.App.Views
             HookSlider(AccessibilitySlider);
             HookSlider(DemandSlider);
             HookSlider(CompetitionSlider);
+
+            // Live recompute: update map when weights recompute
+            vm.WeightsRecomputed += async (_, cells) =>
+            {
+                try
+                {
+                    _renderCts?.Cancel();
+                    _renderCts = new CancellationTokenSource();
+                    var geo = GeoJsonHelper.BuildFeatureCollection(cells);
+                    await Map.UpdateHeatmapAsync(geo, _renderCts.Token);
+                    MainThread.BeginInvokeOnMainThread(() =>
+                        SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Status_Updated"]))
+                    ;
+                }
+                catch (OperationCanceledException) { }
+            };
+
+            // Announce updating state politely
+            vm.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.IsUpdating) && vm.IsUpdating)
+                {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                        SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Weights_Updating"]))
+                    ;
+                }
+            };
         }
 
         private CancellationTokenSource? _renderCts;

@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="Resources/Styles/Spacing.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <utils:ResKeyToTextConverter x:Key="ResKeyToTextConverter" />
+            <utils:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -39,4 +39,9 @@
   <data name="rationale_good_access" xml:space="preserve"><value>Dobra povezanost parkinga i prevoza</value></data>
   <data name="rationale_high_demand" xml:space="preserve"><value>Visok potencijal potražnje u oblasti</value></data>
   <data name="rationale_high_competition" xml:space="preserve"><value>Velika gustina konkurencije</value></data>
+  <data name="Weights_Updating" xml:space="preserve"><value>Ažuriranje…</value></data>
+  <data name="Status_Updated" xml:space="preserve"><value>Ažurirano.</value></data>
+  <data name="Recompute_PromptRerun" xml:space="preserve"><value>Nedostaju podaci. Prvo pokrenite punu analizu.</value></data>
+  <data name="Recompute_NoCells" xml:space="preserve"><value>Nema rezultata za prikaz. Pokrenite analizu ponovo.</value></data>
+  <data name="Recompute_Error" xml:space="preserve"><value>Ažuriranje nije uspelo. Pokušajte ponovo.</value></data>
 </root>

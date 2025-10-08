@@ -39,4 +39,9 @@
   <data name="rationale_good_access" xml:space="preserve"><value>Good access to parking and transit</value></data>
   <data name="rationale_high_demand" xml:space="preserve"><value>High potential demand in the area</value></data>
   <data name="rationale_high_competition" xml:space="preserve"><value>High competition density</value></data>
+  <data name="Weights_Updating" xml:space="preserve"><value>Updating…</value></data>
+  <data name="Status_Updated" xml:space="preserve"><value>Updated.</value></data>
+  <data name="Recompute_PromptRerun" xml:space="preserve"><value>Need data. Please run full analysis first.</value></data>
+  <data name="Recompute_NoCells" xml:space="preserve"><value>No results to display. Please rerun analysis.</value></data>
+  <data name="Recompute_Error" xml:space="preserve"><value>Update failed. Please try again.</value></data>
 </root>

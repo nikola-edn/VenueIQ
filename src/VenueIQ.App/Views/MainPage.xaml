@@ -28,7 +28,15 @@
                     <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                         <Label Text="{Binding [Main_AdvancedWeights], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
                         <Button Text="{Binding [Weights_AutoBalance], Source={x:Static loc:LocalizationResourceManager.Instance}}" Command="{Binding AutoBalanceCommand}" AutomationId="Weights.AutoBalanceButton" />
+                        <Label Text="{Binding [Weights_Updating], Source={x:Static loc:LocalizationResourceManager.Instance}}"
+                               IsVisible="{Binding IsUpdating}"
+                               TextColor="#666"
+                               AutomationId="Weights.UpdatingIndicator"/>
                     </HorizontalStackLayout>
+                    <Label Text="{Binding StatusMessageKey, Converter={StaticResource ResKeyToTextConverter}}"
+                           IsVisible="{Binding StatusMessageKey, Converter={StaticResource StringNotEmptyConverter}}"
+                           TextColor="#B71C1C"
+                           AutomationId="Weights.StatusMessage" />
 
                     <!-- Complements -->
                     <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto">

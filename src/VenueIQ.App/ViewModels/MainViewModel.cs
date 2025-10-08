@@ -12,10 +12,12 @@ namespace VenueIQ.App.ViewModels;
 public class MainViewModel : INotifyPropertyChanged
 {
     private readonly SettingsService _settings;
+    private readonly MapAnalysisService _analysis;
 
-    public MainViewModel(SettingsService settings)
+    public MainViewModel(SettingsService settings, MapAnalysisService analysis)
     {
         _settings = settings;
+        _analysis = analysis;
         ResetDefaultsCommand = new AsyncCommand(ResetDefaultsAsync);
         AutoBalanceCommand = new AsyncCommand(AutoBalanceAsync);
     }
@@ -47,7 +49,7 @@ public class MainViewModel : INotifyPropertyChanged
             {
                 _isDraggingWeights = value;
                 OnPropertyChanged();
-                IsAnalyzeEnabled = !value;
+                IsAnalyzeEnabled = !(value || IsUpdating);
             }
         }
     }
@@ -56,10 +58,10 @@ public class MainViewModel : INotifyPropertyChanged
 
     // Percent-facing properties for UI (0-100)
     private double _wComplementsPercent = 35, _wAccessibilityPercent = 25, _wDemandPercent = 25, _wCompetitionPercent = 35;
-    public double WComplementsPercent { get => _wComplementsPercent; set { if (Math.Abs(_wComplementsPercent - value) > 0.0001) { _wComplementsPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); } } }
-    public double WAccessibilityPercent { get => _wAccessibilityPercent; set { if (Math.Abs(_wAccessibilityPercent - value) > 0.0001) { _wAccessibilityPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); } } }
-    public double WDemandPercent { get => _wDemandPercent; set { if (Math.Abs(_wDemandPercent - value) > 0.0001) { _wDemandPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); } } }
-    public double WCompetitionPercent { get => _wCompetitionPercent; set { if (Math.Abs(_wCompetitionPercent - value) > 0.0001) { _wCompetitionPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); } } }
+    public double WComplementsPercent { get => _wComplementsPercent; set { if (Math.Abs(_wComplementsPercent - value) > 0.0001) { _wComplementsPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); ScheduleRecompute(); } } }
+    public double WAccessibilityPercent { get => _wAccessibilityPercent; set { if (Math.Abs(_wAccessibilityPercent - value) > 0.0001) { _wAccessibilityPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); ScheduleRecompute(); } } }
+    public double WDemandPercent { get => _wDemandPercent; set { if (Math.Abs(_wDemandPercent - value) > 0.0001) { _wDemandPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); ScheduleRecompute(); } } }
+    public double WCompetitionPercent { get => _wCompetitionPercent; set { if (Math.Abs(_wCompetitionPercent - value) > 0.0001) { _wCompetitionPercent = value; OnPropertyChanged(); RecomputeNormalizedWeights(); ScheduleRecompute(); } } }
 
     private void RecomputeNormalizedWeights()
     {
@@ -117,6 +119,92 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    // Live recompute infrastructure
+    private CancellationTokenSource? _debounceCts;
+    private CancellationTokenSource? _recomputeCts;
+    private const int DebounceMs = 200; // within 150-250ms per AC
+
+    private bool _isUpdating;
+    public bool IsUpdating
+    {
+        get => _isUpdating;
+        private set
+        {
+            if (_isUpdating != value)
+            {
+                _isUpdating = value;
+                OnPropertyChanged();
+                IsAnalyzeEnabled = !(value || IsDraggingWeights);
+            }
+        }
+    }
+
+    private string? _statusMessageKey;
+    public string? StatusMessageKey { get => _statusMessageKey; private set { if (_statusMessageKey != value) { _statusMessageKey = value; OnPropertyChanged(); } } }
+
+    public event EventHandler<IReadOnlyList<CellScore>>? WeightsRecomputed;
+
+    private void ScheduleRecompute()
+    {
+        _debounceCts?.Cancel();
+        _debounceCts = new CancellationTokenSource();
+        var token = _debounceCts.Token;
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(DebounceMs, token).ConfigureAwait(false);
+                await RecomputeAsync(token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) { }
+        });
+    }
+
+    private async Task RecomputeAsync(CancellationToken token)
+    {
+        _recomputeCts?.Cancel();
+        _recomputeCts = CancellationTokenSource.CreateLinkedTokenSource(token);
+        var ct = _recomputeCts.Token;
+        try
+        {
+            IsUpdating = true;
+            StatusMessageKey = "Weights_Updating";
+            var weights = new Weights(WComplements, WAccessibility, WDemand, WCompetition);
+            if (!await _analysis.HasCachedAsync().ConfigureAwait(false))
+            {
+                StatusMessageKey = "Recompute_PromptRerun";
+                return;
+            }
+            var res = await _analysis.RecomputeAsync(weights, ct).ConfigureAwait(false);
+            if (res.CellDetails is { Count: > 0 })
+            {
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    SetResults(res.CellDetails);
+                    WeightsRecomputed?.Invoke(this, res.CellDetails);
+                });
+                StatusMessageKey = null;
+            }
+            else
+            {
+                await MainThread.InvokeOnMainThreadAsync(() => Results.Clear());
+                StatusMessageKey = "Recompute_NoCells";
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // swallow
+        }
+        catch
+        {
+            StatusMessageKey = "Recompute_Error";
+        }
+        finally
+        {
+            IsUpdating = false;
+        }
+    }
+
     public async Task<(string apiKey, string language)> GetMapInitAsync()
     {
         var key = await _settings.GetApiKeyAsync().ConfigureAwait(false) ?? string.Empty;
@@ -134,6 +222,8 @@ public class MainViewModel : INotifyPropertyChanged
 
     public void SetResults(IReadOnlyList<CellScore> cells, int topN = 10)
     {
+        // Preserve previous selection if possible
+        var prev = Selected;
         var sorted = cells.OrderByDescending(c => c.Score).Take(topN).ToList();
         Results.Clear();
         int rank = 1;
@@ -152,6 +242,18 @@ public class MainViewModel : INotifyPropertyChanged
             foreach (var r in c.RationaleTokens) vm.RationaleKeys.Add(r);
             Results.Add(vm);
         }
-        if (Results.Count > 0) Selected = Results[0];
+        if (Results.Count > 0)
+        {
+            if (prev is not null)
+            {
+                // Try to find the closest match by lat/lng
+                var match = Results.FirstOrDefault(r => Math.Abs(r.Lat - prev.Lat) < 1e-6 && Math.Abs(r.Lng - prev.Lng) < 1e-6);
+                Selected = match ?? Results[0];
+            }
+            else
+            {
+                Selected = Results[0];
+            }
+        }
     }
 }
