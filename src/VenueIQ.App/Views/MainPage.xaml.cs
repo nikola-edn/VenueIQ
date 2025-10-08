@@ -83,6 +83,12 @@ namespace VenueIQ.App.Views
                     ;
                 }
             };
+
+            // Open-in-Maps from tooltip
+            vm.OpenInMapsRequested += async (_, coords) =>
+            {
+                await Map.CenterOnAsync(coords.lat, coords.lng);
+            };
         }
 
         private async Task OpenExportDialogAsync()

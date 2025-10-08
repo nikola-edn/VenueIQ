@@ -93,4 +93,11 @@
   <data name="badge_tt_demand_high" xml:space="preserve"><value>Visok potencijal potražnje</value></data>
   <data name="badge_tt_demand_medium" xml:space="preserve"><value>Umerena potražnja</value></data>
   <data name="badge_tt_demand_low" xml:space="preserve"><value>Niska potražnja</value></data>
+  <data name="Tooltip_Title" xml:space="preserve"><value>Detalji</value></data>
+  <data name="Tooltip_Complements" xml:space="preserve"><value>Komplementi</value></data>
+  <data name="Tooltip_Competitors" xml:space="preserve"><value>Konkurencija</value></data>
+  <data name="Tooltip_NearestTransit" xml:space="preserve"><value>Najbliži prevoz</value></data>
+  <data name="Tooltip_OpenInMaps" xml:space="preserve"><value>Otvori u mapama</value></data>
+  <data name="Tooltip_Close" xml:space="preserve"><value>Zatvori</value></data>
+  <data name="Tooltip_Opened" xml:space="preserve"><value>Prikazan je detaljni prikaz.</value></data>
 </root>

@@ -105,12 +105,13 @@
                             SelectedItem="{Binding Selected}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:ResultItemViewModel">
-                        <Grid Padding="8" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" x:Name="ResultItemRoot">
+                        <Grid Padding="8" ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto" x:Name="ResultItemRoot">
                             <Grid.AutomationId>
                                 <Binding Path="AutomationId" />
                             </Grid.AutomationId>
                             <Label Grid.RowSpan="2" Grid.Column="0" Text="{Binding Rank}" FontAttributes="Bold" />
                             <Label Grid.Column="1" Text="{Binding Score}" />
+                            <Button Grid.Column="2" Text="i" Command="{Binding ToggleTooltipCommand}" AutomationId="Results.Tooltip.Toggle" />
                             <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="6">
                                 <Label Text="{Binding PrimaryBadgeKey, Converter={StaticResource ResKeyToTextConverter}}" />
                                 <CollectionView ItemsSource="{Binding SupportingBadgeKeys}" ItemsLayout="HorizontalList">
@@ -123,12 +124,15 @@
                                     </CollectionView.ItemTemplate>
                                 </CollectionView>
                             </HorizontalStackLayout>
-                            <FlexLayout Grid.Row="2" Grid.Column="1" Direction="Row" Wrap="Wrap" AlignItems="Start" AlignContent="Start" JustifyContent="Start">
+                            <FlexLayout Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Direction="Row" Wrap="Wrap" AlignItems="Start" AlignContent="Start" JustifyContent="Start">
                                 <controls:FactorBadge AutomationId="Results.Badge.Competition" Descriptor="{Binding CompetitionBadge}" />
                                 <controls:FactorBadge AutomationId="Results.Badge.Complements" Descriptor="{Binding ComplementsBadge}" />
                                 <controls:FactorBadge AutomationId="Results.Badge.Accessibility" Descriptor="{Binding AccessibilityBadge}" />
                                 <controls:FactorBadge AutomationId="Results.Badge.Demand" Descriptor="{Binding DemandBadge}" />
                             </FlexLayout>
+                            <!-- Tooltip content row -->
+                            <controls:ResultTooltip Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" IsVisible="{Binding IsTooltipOpen}"
+                                                    OpenInMapsCommand="{Binding Source={x:Reference MainPageRoot}, Path=BindingContext.OpenInMapsCommand}" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

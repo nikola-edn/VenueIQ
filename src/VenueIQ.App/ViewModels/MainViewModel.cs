@@ -73,6 +73,13 @@ public class MainViewModel : INotifyPropertyChanged
 
     public ICommand ResetDefaultsCommand { get; }
     public ICommand AutoBalanceCommand { get; }
+    public ICommand OpenInMapsCommand => new Command<ResultItemViewModel?>(item =>
+    {
+        if (item is null) return;
+        Selected = item;
+        OpenInMapsRequested?.Invoke(this, (item.Lat, item.Lng));
+    });
+    public event EventHandler<(double lat, double lng)>? OpenInMapsRequested;
 
     private async Task ResetDefaultsAsync()
     {
@@ -240,8 +247,16 @@ public class MainViewModel : INotifyPropertyChanged
                 CompetitionBadge = BadgeLogic.ForCompetition(c.CI),
                 ComplementsBadge = BadgeLogic.ForComplements(c.CoI),
                 AccessibilityBadge = BadgeLogic.ForAccessibility(c.AI),
-                DemandBadge = BadgeLogic.ForDemand(c.DI)
+                DemandBadge = BadgeLogic.ForDemand(c.DI),
+                NearestAccessMeters = c.NearestAccessMeters
             };
+            // Map nearest lists
+            if (c.NearestComplements is not null)
+                foreach (var p in c.NearestComplements)
+                    vm.NearestComplements.Add(new NearbyPoiViewModel { Name = p.Name, Category = p.Category, DistanceMeters = p.DistanceMeters });
+            if (c.NearestCompetitors is not null)
+                foreach (var p in c.NearestCompetitors)
+                    vm.NearestCompetitors.Add(new NearbyPoiViewModel { Name = p.Name, Category = p.Category, DistanceMeters = p.DistanceMeters });
             foreach (var b in c.SupportingBadges) vm.SupportingBadgeKeys.Add(b);
             foreach (var r in c.RationaleTokens) vm.RationaleKeys.Add(r);
             Results.Add(vm);

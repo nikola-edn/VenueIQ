@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:VenueIQ.App.ViewModels"
+             xmlns:loc="clr-namespace:VenueIQ.App.Helpers"
+             xmlns:controls="clr-namespace:VenueIQ.App.Controls"
+             x:Class="VenueIQ.App.Controls.ResultTooltip"
+             x:Name="Root"
+             x:DataType="vm:ResultItemViewModel">
+    <Border x:Name="TooltipContainer" Padding="12" Background="#FFFA" Stroke="#DDD" StrokeThickness="1" AutomationId="Results.Tooltip"
+            SemanticProperties.Description="tooltip">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+        </Border.StrokeShape>
+        <Grid RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
+            <Label Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding [Tooltip_Title], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
+
+            <!-- Factor badges summary -->
+            <HorizontalStackLayout Grid.Row="1" Grid.ColumnSpan="2" Spacing="6">
+                <controls:FactorBadge Descriptor="{Binding CompetitionBadge}" />
+                <controls:FactorBadge Descriptor="{Binding ComplementsBadge}" />
+                <controls:FactorBadge Descriptor="{Binding AccessibilityBadge}" />
+                <controls:FactorBadge Descriptor="{Binding DemandBadge}" />
+            </HorizontalStackLayout>
+
+            <!-- Quick metrics -->
+            <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2" Spacing="8">
+                <Label Text="{Binding [Tooltip_NearestTransit], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                <Label Text="{Binding NearestAccessMeters, StringFormat='{}{0:0} m'}"/>
+            </HorizontalStackLayout>
+
+            <!-- POI lists -->
+            <Grid Grid.Row="3" Grid.Column="0" RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,*">
+                <Label Grid.Row="0" Grid.Column="0" Text="{Binding [Tooltip_Complements], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
+                <Label Grid.Row="0" Grid.Column="1" Text="{Binding [Tooltip_Competitors], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
+                <ScrollView Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" HeightRequest="140">
+                    <VerticalStackLayout>
+                        <CollectionView ItemsSource="{Binding NearestComplements}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:NearbyPoiViewModel">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label Text="{Binding Name}" />
+                                        <Label Text="{Binding Category}" TextColor="#666" />
+                                        <Label Text="{Binding DistanceText}" />
+                                    </HorizontalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </ScrollView>
+                <ScrollView Grid.Row="1" Grid.Column="1" Grid.RowSpan="3" HeightRequest="140">
+                    <VerticalStackLayout>
+                        <CollectionView ItemsSource="{Binding NearestCompetitors}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:NearbyPoiViewModel">
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label Text="{Binding Name}" />
+                                        <Label Text="{Binding Category}" TextColor="#666" />
+                                        <Label Text="{Binding DistanceText}" />
+                                    </HorizontalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </ScrollView>
+            </Grid>
+
+            <!-- Actions -->
+            <HorizontalStackLayout Grid.Row="0" Grid.Column="1" HorizontalOptions="End" Spacing="8">
+                <Button x:Name="OpenInMapsButton" Text="{Binding [Tooltip_OpenInMaps], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Results.Tooltip.OpenInMaps"
+                        Command="{Binding Source={x:Reference Root}, Path=OpenInMapsCommand}" CommandParameter="{Binding .}" />
+                <Button x:Name="CloseButton" Text="{Binding [Tooltip_Close], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Results.Tooltip.Close" />
+            </HorizontalStackLayout>
+        </Grid>
+    </Border>
+</ContentView>
+

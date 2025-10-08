@@ -44,6 +44,9 @@ public class AnalysisEngine
         var coiRaw = new double[grid.Cells.Count];
         var aiRaw = new double[grid.Cells.Count];
         var diRaw = new double[grid.Cells.Count];
+        var nearestCompPerCell = new List<List<(double d, PoiSummary poi)>>(grid.Cells.Count);
+        var nearestComplPerCell = new List<List<(double d, PoiSummary poi)>>(grid.Cells.Count);
+        var nearestAccessPerCell = new List<double?>(grid.Cells.Count);
 
         // Category buckets for AI and DI derivation
         static bool IsAccess(string? code) => code == "POI_PARKING" || code == "POI_PUBLIC_TRANSPORT_STATION";
@@ -53,11 +56,16 @@ public class AnalysisEngine
         {
             var (lat, lng) = grid.Cells[i];
             double ci = 0, co = 0, ai = 0, di = 0;
+            // Track nearest POIs
+            var topComp = new List<(double d, PoiSummary poi)>(3);
+            var topCompl = new List<(double d, PoiSummary poi)>(3);
+            double? nearestAccess = null;
 
             foreach (var p in compArr)
             {
                 var d = HaversineMeters(lat, lng, p.Lat, p.Lng);
                 ci += Math.Exp(-d / 300.0);
+                InsertNearest(topComp, (d, p), 3);
             }
             foreach (var p in compoArr)
             {
@@ -66,10 +74,15 @@ public class AnalysisEngine
                 co += k;
                 if (IsAccess(p.Category)) ai += k;
                 if (IsDemand(p.Category)) di += k;
+                InsertNearest(topCompl, (d, p), 3);
+                if (IsAccess(p.Category)) nearestAccess = nearestAccess is null ? d : Math.Min(nearestAccess.Value, d);
             }
             if (ai == 0) ai = co * 0.5; // fallback heuristic
             if (di == 0) di = co * 0.5; // fallback heuristic
             ciRaw[i] = ci; coiRaw[i] = co; aiRaw[i] = ai; diRaw[i] = di;
+            nearestCompPerCell.Add(topComp);
+            nearestComplPerCell.Add(topCompl);
+            nearestAccessPerCell.Add(nearestAccess);
         }
 
         var ciN = Normalize(ciRaw);
@@ -96,9 +109,30 @@ public class AnalysisEngine
             if (aiN[i] > 0.6) cs.RationaleTokens.Add("rationale.good_access");
             if (diN[i] > 0.6) cs.RationaleTokens.Add("rationale.high_demand");
             if (ciN[i] > 0.7) cs.RationaleTokens.Add("rationale.high_competition");
+            // Attach nearest POIs
+            var comps = nearestCompPerCell[i].OrderBy(t => t.d).Take(3)
+                .Select(t => new NearbyPoi { Name = t.poi.Name, Category = t.poi.Category, DistanceMeters = t.d }).ToList();
+            var compls = nearestComplPerCell[i].OrderBy(t => t.d).Take(3)
+                .Select(t => new NearbyPoi { Name = t.poi.Name, Category = t.poi.Category, DistanceMeters = t.d }).ToList();
+            cs.NearestCompetitors = comps;
+            cs.NearestComplements = compls;
+            cs.NearestAccessMeters = nearestAccessPerCell[i];
             list.Add(cs);
         }
         return list;
+    }
+
+    private static void InsertNearest(List<(double d, PoiSummary poi)> list, (double d, PoiSummary poi) item, int k)
+    {
+        if (list.Count == 0)
+        {
+            list.Add(item);
+            return;
+        }
+        int idx = list.FindIndex(t => item.d < t.d);
+        if (idx < 0) list.Add(item);
+        else list.Insert(idx, item);
+        if (list.Count > k) list.RemoveAt(list.Count - 1);
     }
 
     public static double[] Normalize(double[] values)

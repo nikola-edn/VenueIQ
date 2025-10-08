@@ -48,4 +48,14 @@ public class CellScore
     public List<string> SupportingBadges { get; set; } = new();
     public List<string> RationaleTokens { get; set; } = new();
     public double CoverageConfidence { get; set; }
+    public List<NearbyPoi> NearestCompetitors { get; set; } = new();
+    public List<NearbyPoi> NearestComplements { get; set; } = new();
+    public double? NearestAccessMeters { get; set; }
+}
+
+public class NearbyPoi
+{
+    public string? Name { get; set; }
+    public string? Category { get; set; }
+    public double DistanceMeters { get; set; }
 }
