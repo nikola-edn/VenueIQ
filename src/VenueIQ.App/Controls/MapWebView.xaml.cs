@@ -84,5 +84,27 @@ namespace VenueIQ.App.Controls
             var js = $"window.venueiq && window.venueiq.centerOn && window.venueiq.centerOn({lng.ToString(System.Globalization.CultureInfo.InvariantCulture)}, {lat.ToString(System.Globalization.CultureInfo.InvariantCulture)}, {{ score: {(score.HasValue ? score.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "0")} }})";
             return EvaluateJavaScriptAsync(js).WaitAsync(ct);
         }
+
+        public async Task<byte[]?> CaptureImageAsync(string format = "png", double scale = 1.0, CancellationToken ct = default)
+        {
+            try
+            {
+                var js = $"(window.venueiq && window.venueiq.exportImage) ? window.venueiq.exportImage('{format}', {scale.ToString(System.Globalization.CultureInfo.InvariantCulture)}) : 'ERROR:noexport'";
+                using var reg = ct.Register(() => throw new OperationCanceledException(ct));
+                var result = await EvaluateJavaScriptAsync(js).WaitAsync(ct);
+                if (result is null) return null;
+                if (result.StartsWith("ERROR:")) return null;
+                // result is base64 without prefix
+                return Convert.FromBase64String(result);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

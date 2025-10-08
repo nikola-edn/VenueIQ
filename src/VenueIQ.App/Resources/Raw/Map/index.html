@@ -5,15 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>VenueIQ Map</title>
   <style>
-    html, body, #map { height:100%; margin:0; padding:0; }
+    html, body, #exportRoot { height:100%; margin:0; padding:0; }
+    #map { height:100%; }
     #legend { position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.9); border-radius:8px; padding:8px 10px; box-shadow:0 2px 6px rgba(0,0,0,0.15); font-family:sans-serif; }
   </style>
   <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css" />
   <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
-  <div id="map" role="application" aria-label="Azure map"></div>
-  <div id="legend" aria-label="Legend">Legend (placeholder)</div>
+  <div id="exportRoot" aria-label="Map export root" style="position:relative;">
+    <div id="map" role="application" aria-label="Azure map"></div>
+    <div id="legend" aria-label="Legend">Legend (placeholder)</div>
+  </div>
   <script>
     (function(){
       const subKey = '{{API_KEY}}';
@@ -87,6 +91,20 @@
 
           // Notify host app
           window.location.href = 'app://mapReady';
+
+          // Export image: returns base64 (no data URI prefix). format: 'png'|'jpeg'. scale: 1 (standard) or >1 (high-res)
+          window.venueiq.exportImage = async function(format, scale){
+            try {
+              const root = document.getElementById('exportRoot');
+              const opt = { backgroundColor: null, scale: Math.max(1, Number(scale) || 1) };
+              const canvas = await html2canvas(root, opt);
+              const mime = (format === 'jpeg' || format === 'jpg') ? 'image/jpeg' : 'image/png';
+              const url = canvas.toDataURL(mime, 0.92);
+              return url.split(',')[1];
+            } catch (e){
+              return 'ERROR:' + (e && e.message ? e.message : 'export');
+            }
+          };
         });
       } catch (err) {
         const reason = encodeURIComponent((err && err.message) ? err.message : 'unknown');

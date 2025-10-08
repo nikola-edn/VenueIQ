@@ -9,10 +9,11 @@
              x:Name="MainPageRoot">
 
     <Grid RowDefinitions="Auto,*" Padding="16">
-            <Grid x:Name="HeaderBar" ColumnDefinitions="*,Auto,Auto" Row="0" Margin="0,0,0,12">
+            <Grid x:Name="HeaderBar" ColumnDefinitions="*,Auto,Auto,Auto" Row="0" Margin="0,0,0,12">
             <Picker x:Name="BusinessTypePicker" AutomationId="Main.BusinessTypePicker"/>
             <Slider Grid.Column="1" x:Name="RadiusSlider" AutomationId="Main.RadiusSlider" Minimum="0.5" Maximum="5" Value="{Binding RadiusKm}"/>
             <Button Grid.Column="2" x:Name="AnalyzeButton" AutomationId="Main.AnalyzeButton" Text="{Binding [Main_Analyze], Source={x:Static loc:LocalizationResourceManager.Instance}}" IsEnabled="{Binding IsAnalyzeEnabled}"/>
+            <Button Grid.Column="3" x:Name="ExportButton" AutomationId="Main.ExportButton" Text="{Binding [Export_Heatmap], Source={x:Static loc:LocalizationResourceManager.Instance}}"/>
         </Grid>
 
         <Grid Row="1" ColumnDefinitions="2*,*" RowDefinitions="Auto,*,Auto" ColumnSpacing="12">
@@ -126,6 +127,43 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
             <Button Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding [Main_ResetDefaults], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Main.ResetDefaultsButton" Command="{Binding ResetDefaultsCommand}" />
+        </Grid>
+        <!-- Export Dialog Overlay -->
+        <Grid x:Name="ExportDialogOverlay" Grid.RowSpan="2" BackgroundColor="#66000000" IsVisible="False" AutomationId="ExportHeatmap.Dialog">
+            <Frame Padding="16" CornerRadius="10" HasShadow="True" WidthRequest="520" HorizontalOptions="Center" VerticalOptions="Center" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#2B2B2B}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="{Binding [Export_Dialog_Title], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" FontSize="18" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                        <VerticalStackLayout Grid.Column="0" Spacing="8">
+                            <Label Text="{Binding [Export_Format_Label], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                            <HorizontalStackLayout>
+                                <RadioButton x:Name="ExportFormatPng" Content="{Binding [Export_Format_PNG], Source={x:Static loc:LocalizationResourceManager.Instance}}" GroupName="Format" IsChecked="True" />
+                                <RadioButton x:Name="ExportFormatJpg" Content="{Binding [Export_Format_JPG], Source={x:Static loc:LocalizationResourceManager.Instance}}" GroupName="Format" />
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding [Export_Resolution_Label], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                            <HorizontalStackLayout>
+                                <RadioButton x:Name="ExportResStandard" Content="{Binding [Export_Resolution_Standard], Source={x:Static loc:LocalizationResourceManager.Instance}}" GroupName="Resolution" IsChecked="True" />
+                                <RadioButton x:Name="ExportResHigh" Content="{Binding [Export_Resolution_High], Source={x:Static loc:LocalizationResourceManager.Instance}}" GroupName="Resolution" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="{Binding [Export_Preview], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                            <Frame Padding="0" BorderColor="#DDD" BackgroundColor="#FFF" HeightRequest="180">
+                                <Image x:Name="ExportPreviewImage" Aspect="AspectFill"/>
+                            </Frame>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Label x:Name="ExportProgressLabel" TextColor="#666" IsVisible="False" />
+
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" />
+                        <Button Grid.Column="1" x:Name="CancelExportButton" Text="{Binding [Export_Cancel], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                        <Button Grid.Column="2" x:Name="SaveExportButton" AutomationId="ExportHeatmap.SaveButton" Text="{Binding [Export_Save], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
         </Grid>
     </Grid>
 

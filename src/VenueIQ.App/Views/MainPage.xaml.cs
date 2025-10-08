@@ -1,4 +1,5 @@
-﻿using VenueIQ.App.Helpers;
+﻿using System.IO;
+using VenueIQ.App.Helpers;
 using VenueIQ.App.ViewModels;
 using VenueIQ.App.Controls;
 using VenueIQ.App.Services;
@@ -41,6 +42,7 @@ namespace VenueIQ.App.Views
             };
 
             AnalyzeButton.Clicked += async (_, __) => await RunAnalysisAsync();
+            ExportButton.Clicked += async (_, __) => await OpenExportDialogAsync();
             ResultsList_SelectionSetup();
 
             // Sliders drag state: disable Analyze while dragging
@@ -80,6 +82,90 @@ namespace VenueIQ.App.Views
                     ;
                 }
             };
+        }
+
+        private async Task OpenExportDialogAsync()
+        {
+            try
+            {
+                ExportDialogOverlay.IsVisible = true;
+                ExportProgressLabel.IsVisible = true;
+                ExportProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["Export_Preview_Loading"];
+                await Task.Yield();
+                var preview = await Map.CaptureImageAsync("png", 0.5);
+                if (preview is not null)
+                {
+                    ExportPreviewImage.Source = ImageSource.FromStream(() => new MemoryStream(preview));
+                    ExportProgressLabel.IsVisible = false;
+                    MainThread.BeginInvokeOnMainThread(() =>
+                        SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Export_Preview_Ready"]))
+                    ;
+                }
+                else
+                {
+                    ExportProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["Export_Preview_Unavailable"];
+                }
+            }
+            catch
+            {
+                ExportProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["Export_Preview_Unavailable"];
+            }
+
+            CancelExportButton.Clicked -= CancelExportButton_Clicked;
+            CancelExportButton.Clicked += CancelExportButton_Clicked;
+            SaveExportButton.Clicked -= SaveExportButton_Clicked;
+            SaveExportButton.Clicked += SaveExportButton_Clicked;
+        }
+
+        private void CancelExportButton_Clicked(object? sender, EventArgs e)
+        {
+            ExportDialogOverlay.IsVisible = false;
+            ExportPreviewImage.Source = null;
+            ExportProgressLabel.IsVisible = false;
+        }
+
+        private async void SaveExportButton_Clicked(object? sender, EventArgs e)
+        {
+            try
+            {
+                SaveExportButton.IsEnabled = false;
+                ExportProgressLabel.IsVisible = true;
+                ExportProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["Export_Saving"];
+                MainThread.BeginInvokeOnMainThread(() =>
+                    SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Export_Saving"]))
+                ;
+
+                var vm = (MainViewModel)BindingContext;
+                var format = ExportFormatJpg.IsChecked ? "jpeg" : "png";
+                var scale = ExportResHigh.IsChecked ? 2.0 : 1.0;
+                var weights = (vm.WComplements, vm.WAccessibility, vm.WDemand, vm.WCompetition);
+                var business = "Coffee"; // TODO: bind from picker when wired
+
+                var export = ServiceHost.GetRequiredService<ExportService>();
+                var path = await export.ExportHeatmapAsync(Map, format, scale, weights, vm.RadiusKm, business);
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    ExportProgressLabel.Text = string.Format(Helpers.LocalizationResourceManager.Instance["Export_Success"], path);
+                    MainThread.BeginInvokeOnMainThread(() =>
+                        SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Export_Success_A11y"]))
+                    ;
+                }
+                else
+                {
+                    ExportProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["Export_Error"];
+                    MainThread.BeginInvokeOnMainThread(() =>
+                        SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Export_Error"]))
+                    ;
+                }
+            }
+            catch
+            {
+                ExportProgressLabel.Text = Helpers.LocalizationResourceManager.Instance["Export_Error"];
+            }
+            finally
+            {
+                SaveExportButton.IsEnabled = true;
+            }
         }
 
         private CancellationTokenSource? _renderCts;

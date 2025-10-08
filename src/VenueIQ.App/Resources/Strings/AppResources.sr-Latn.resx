@@ -44,4 +44,22 @@
   <data name="Recompute_PromptRerun" xml:space="preserve"><value>Nedostaju podaci. Prvo pokrenite punu analizu.</value></data>
   <data name="Recompute_NoCells" xml:space="preserve"><value>Nema rezultata za prikaz. Pokrenite analizu ponovo.</value></data>
   <data name="Recompute_Error" xml:space="preserve"><value>Ažuriranje nije uspelo. Pokušajte ponovo.</value></data>
+  <data name="Export_Heatmap" xml:space="preserve"><value>Izvezi</value></data>
+  <data name="Export_Dialog_Title" xml:space="preserve"><value>Izvoz toplotne mape</value></data>
+  <data name="Export_Format_Label" xml:space="preserve"><value>Format</value></data>
+  <data name="Export_Format_PNG" xml:space="preserve"><value>PNG</value></data>
+  <data name="Export_Format_JPG" xml:space="preserve"><value>JPG</value></data>
+  <data name="Export_Resolution_Label" xml:space="preserve"><value>Rezolucija</value></data>
+  <data name="Export_Resolution_Standard" xml:space="preserve"><value>Standard</value></data>
+  <data name="Export_Resolution_High" xml:space="preserve"><value>Visoka rezolucija</value></data>
+  <data name="Export_Preview" xml:space="preserve"><value>Pregled</value></data>
+  <data name="Export_Preview_Loading" xml:space="preserve"><value>Priprema pregleda…</value></data>
+  <data name="Export_Preview_Ready" xml:space="preserve"><value>Pregled je spreman.</value></data>
+  <data name="Export_Preview_Unavailable" xml:space="preserve"><value>Pregled nije dostupan; izvoz će snimiti trenutnu mapu.</value></data>
+  <data name="Export_Save" xml:space="preserve"><value>Sačuvaj</value></data>
+  <data name="Export_Cancel" xml:space="preserve"><value>Otkaži</value></data>
+  <data name="Export_Saving" xml:space="preserve"><value>Snimanje…</value></data>
+  <data name="Export_Success" xml:space="preserve"><value>Sačuvano u {0}</value></data>
+  <data name="Export_Success_A11y" xml:space="preserve"><value>Izvoz je završen.</value></data>
+  <data name="Export_Error" xml:space="preserve"><value>Izvoz nije uspeo. Pokušajte ponovo.</value></data>
 </root>

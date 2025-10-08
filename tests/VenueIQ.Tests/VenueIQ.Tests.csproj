@@ -14,5 +14,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\VenueIQ.Core\VenueIQ.Core.csproj" />
+    <ProjectReference Include="..\..\src\VenueIQ.App\VenueIQ.App.csproj" />
   </ItemGroup>
 </Project>
