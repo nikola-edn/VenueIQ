@@ -24,13 +24,15 @@ namespace VenueIQ.App.Views
                     try
                     {
                         Map.MapReady += (_, ____) => MapLoadingOverlay.IsVisible = false;
-                        Map.HeatmapRendered += (_, ____) => MainThread.BeginInvokeOnMainThread(() => SemanticScreenReader.Announce("Heatmap updated"));
+                        Map.HeatmapRendered += (_, ____) => MainThread.BeginInvokeOnMainThread(() =>
+                            SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Map_HeatmapUpdated"]))
+                        ;
                         Map.MapError += (_, reason) =>
                         {
                             MapLoadingOverlay.IsVisible = false;
                             // TODO: Hook telemetry/logging here
                             MainThread.BeginInvokeOnMainThread(() =>
-                                SemanticScreenReader.Announce($"Map error: {reason}"));
+                                SemanticScreenReader.Announce(string.Format(Helpers.LocalizationResourceManager.Instance["Map_Error"], reason)));
                         };
                         await Map.InitializeAsync(apiKey, lang);
                     }

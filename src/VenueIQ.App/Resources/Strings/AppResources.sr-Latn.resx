@@ -100,4 +100,7 @@
   <data name="Tooltip_OpenInMaps" xml:space="preserve"><value>Otvori u mapama</value></data>
   <data name="Tooltip_Close" xml:space="preserve"><value>Zatvori</value></data>
   <data name="Tooltip_Opened" xml:space="preserve"><value>Prikazan je detaljni prikaz.</value></data>
+  <data name="Map_A11y_MapArea" xml:space="preserve"><value>Interaktivno područje mape</value></data>
+  <data name="Map_HeatmapUpdated" xml:space="preserve"><value>Toplotna mapa je ažurirana</value></data>
+  <data name="Map_Error" xml:space="preserve"><value>Greška na mapi: {0}</value></data>
 </root>
