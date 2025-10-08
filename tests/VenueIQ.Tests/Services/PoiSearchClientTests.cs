@@ -23,7 +23,7 @@ public class PoiSearchClientTests
         {
             LastRequestUri = request.RequestUri;
             if (request.RequestUri is not null) Requests.Add(request.RequestUri);
-            var json = "{\"results\":[{\"id\":\"1\",\"poi\":{\"name\":\"Cafe\",\"classifications\":[{\"code\":\"POI_CAFE\"}]},\"position\":{\"lat\":44.8,\"lon\":20.5},\"dist\":100.0}]}";
+            var json = "{\"results\":[{\"id\":\"1\",\"poi\":{\"name\":\"Cafe\",\"classifications\":[{\"code\":\"CAFE_PUB\"}]},\"position\":{\"lat\":44.8,\"lon\":20.5},\"dist\":100.0}]}";
             var resp = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(json)
@@ -40,7 +40,7 @@ public class PoiSearchClientTests
     private sealed class FakeCat : IPoiCategoryMapProvider
     {
         public Task<(IReadOnlyList<string> competitors, IReadOnlyList<string> complements)> GetCategoriesAsync(BusinessType business, CancellationToken ct = default)
-            => Task.FromResult<(IReadOnlyList<string> competitors, IReadOnlyList<string> complements)>((competitors: new[] { "POI_CAFE" }, complements: new[] { "POI_PARKING" }));
+            => Task.FromResult<(IReadOnlyList<string> competitors, IReadOnlyList<string> complements)>((competitors: new[] { "CAFE_PUB" }, complements: new[] { "OPEN_PARKING_AREA" }));
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class PoiSearchClientTests
         Assert.True(result.Meta.CompetitorCount >= 1);
         Assert.NotNull(handler.LastRequestUri);
         var uris = handler.Requests.Select(u => u.ToString()).ToList();
-        Assert.Contains(uris, s => s.Contains("categorySet=POI_CAFE"));
+        Assert.Contains(uris, s => s.Contains("categorySet=CAFE_PUB"));
         var last = handler.LastRequestUri!.ToString();
         Assert.Contains("language=sr-Latn", last);
         Assert.Contains("lat=44.787", last);
@@ -66,4 +66,3 @@ public class PoiSearchClientTests
         Assert.Contains("radius=2000", last);
     }
 }
-

@@ -39,6 +39,7 @@ public class CellScore
 {
     public double Lat { get; set; }
     public double Lng { get; set; }
+    public double StepMeters { get; set; }
     public double CI { get; set; }
     public double CoI { get; set; }
     public double AI { get; set; }

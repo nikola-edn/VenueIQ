@@ -7,71 +7,117 @@
              x:Class="VenueIQ.App.Controls.ResultTooltip"
              x:Name="Root"
              x:DataType="vm:ResultItemViewModel">
-    <Border x:Name="TooltipContainer" Padding="12" Background="#FFFA" Stroke="#DDD" StrokeThickness="1" AutomationId="Results.Tooltip"
+    <Border x:Name="TooltipContainer" Padding="12" Background="#FFFA" Stroke="#DDD" StrokeThickness="1"
             SemanticProperties.Description="tooltip">
         <Border.StrokeShape>
             <RoundRectangle CornerRadius="12" />
         </Border.StrokeShape>
-        <Grid RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
-            <Label Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding [Tooltip_Title], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
-
-            <!-- Factor badges summary -->
-            <HorizontalStackLayout Grid.Row="1" Grid.ColumnSpan="2" Spacing="6">
-                <controls:FactorBadge Descriptor="{Binding CompetitionBadge}" />
-                <controls:FactorBadge Descriptor="{Binding ComplementsBadge}" />
-                <controls:FactorBadge Descriptor="{Binding AccessibilityBadge}" />
-                <controls:FactorBadge Descriptor="{Binding DemandBadge}" />
-            </HorizontalStackLayout>
-
-            <!-- Quick metrics -->
-            <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2" Spacing="8">
-                <Label Text="{Binding [Tooltip_NearestTransit], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
-                <Label Text="{Binding NearestAccessMeters, StringFormat='{}{0:0} m'}"/>
-            </HorizontalStackLayout>
-
-            <!-- POI lists -->
-            <Grid Grid.Row="3" Grid.Column="0" RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,*">
-                <Label Grid.Row="0" Grid.Column="0" Text="{Binding [Tooltip_Complements], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
-                <Label Grid.Row="0" Grid.Column="1" Text="{Binding [Tooltip_Competitors], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
-                <ScrollView Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" HeightRequest="140">
-                    <VerticalStackLayout>
-                        <CollectionView ItemsSource="{Binding NearestComplements}">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:NearbyPoiViewModel">
-                                    <HorizontalStackLayout Spacing="6">
-                                        <Label Text="{Binding Name}" />
-                                        <Label Text="{Binding Category}" TextColor="#666" />
-                                        <Label Text="{Binding DistanceText}" />
-                                    </HorizontalStackLayout>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
+        <ScrollView>
+            <VerticalStackLayout Spacing="10">
+                <!-- Header: Rank + Score and Actions -->
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label Text="{Binding [Tooltip_Score], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
+                        <Label Text="{Binding Score, StringFormat='{}{0:0.000}'}" FontSize="18" />
                     </VerticalStackLayout>
-                </ScrollView>
-                <ScrollView Grid.Row="1" Grid.Column="1" Grid.RowSpan="3" HeightRequest="140">
-                    <VerticalStackLayout>
-                        <CollectionView ItemsSource="{Binding NearestCompetitors}">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:NearbyPoiViewModel">
-                                    <HorizontalStackLayout Spacing="6">
-                                        <Label Text="{Binding Name}" />
-                                        <Label Text="{Binding Category}" TextColor="#666" />
-                                        <Label Text="{Binding DistanceText}" />
-                                    </HorizontalStackLayout>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </VerticalStackLayout>
-                </ScrollView>
-            </Grid>
+                    <Button Grid.Column="1" x:Name="OpenInMapsButton" Text="{Binding [Tooltip_OpenInMaps], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Results.Tooltip.OpenInMaps"
+                            Command="{Binding Source={x:Reference Root}, Path=OpenInMapsCommand}" CommandParameter="{Binding .}" />
+                    <Button Grid.Column="2" x:Name="CloseButton" Text="{Binding [Tooltip_Close], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Results.Tooltip.Close" />
+                </Grid>
 
-            <!-- Actions -->
-            <HorizontalStackLayout Grid.Row="0" Grid.Column="1" HorizontalOptions="End" Spacing="8">
-                <Button x:Name="OpenInMapsButton" Text="{Binding [Tooltip_OpenInMaps], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Results.Tooltip.OpenInMaps"
-                        Command="{Binding Source={x:Reference Root}, Path=OpenInMapsCommand}" CommandParameter="{Binding .}" />
-                <Button x:Name="CloseButton" Text="{Binding [Tooltip_Close], Source={x:Static loc:LocalizationResourceManager.Instance}}" AutomationId="Results.Tooltip.Close" />
-            </HorizontalStackLayout>
-        </Grid>
+                <!-- Badges Summary -->
+                <HorizontalStackLayout Spacing="6">
+                    <controls:FactorBadge Descriptor="{Binding CompetitionBadge}" />
+                    <controls:FactorBadge Descriptor="{Binding ComplementsBadge}" />
+                    <controls:FactorBadge Descriptor="{Binding AccessibilityBadge}" />
+                    <controls:FactorBadge Descriptor="{Binding DemandBadge}" />
+                </HorizontalStackLayout>
+
+                <!-- Score Composition -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{Binding [Tooltip_ScoreComposition], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
+
+                    <!-- Complements -->
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="{Binding [Weights_Complements], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                        <ProgressBar Grid.Column="1" Progress="{Binding CoI}" ProgressColor="#2E7D32" HeightRequest="8" />
+                        <VerticalStackLayout Grid.Column="2">
+                            <Label Text="{Binding ContribComplements, StringFormat='{}{0:+0.000;-0.000}'}" />
+                            <Label Text="{Binding WComplementsUsed, StringFormat='w={0:0.00}'}" FontSize="10" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Accessibility -->
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="{Binding [Weights_Accessibility], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                        <ProgressBar Grid.Column="1" Progress="{Binding AI}" ProgressColor="#1565C0" HeightRequest="8" />
+                        <VerticalStackLayout Grid.Column="2">
+                            <Label Text="{Binding ContribAccessibility, StringFormat='{}{0:+0.000;-0.000}'}" />
+                            <Label Text="{Binding WAccessibilityUsed, StringFormat='w={0:0.00}'}" FontSize="10" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Demand -->
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="{Binding [Weights_Demand], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                        <ProgressBar Grid.Column="1" Progress="{Binding DI}" ProgressColor="#8E24AA" HeightRequest="8" />
+                        <VerticalStackLayout Grid.Column="2">
+                            <Label Text="{Binding ContribDemand, StringFormat='{}{0:+0.000;-0.000}'}" />
+                            <Label Text="{Binding WDemandUsed, StringFormat='w={0:0.00}'}" FontSize="10" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Competition (negative) -->
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="{Binding [Weights_Competition], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                        <ProgressBar Grid.Column="1" Progress="{Binding CI}" ProgressColor="#B71C1C" HeightRequest="8" />
+                        <VerticalStackLayout Grid.Column="2">
+                            <Label Text="{Binding ContribCompetition, StringFormat='{}{0:+0.000;-0.000}'}" />
+                            <Label Text="{Binding WCompetitionUsed, StringFormat='w={0:0.00}'}" FontSize="10" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- Nearest Transits -->
+                <HorizontalStackLayout Spacing="6">
+                    <Label Text="{Binding [Tooltip_NearestTransit], Source={x:Static loc:LocalizationResourceManager.Instance}}" />
+                    <Label Text="{Binding NearestAccessMeters, StringFormat='{}{0:0} m'}" />
+                </HorizontalStackLayout>
+
+                <!-- Nearby lists stacked vertically to avoid overlap -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{Binding [Tooltip_Complements], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding NearestComplements}" HeightRequest="120">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:NearbyPoiViewModel">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6" Padding="0,2">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="0">
+                                        <Label Text="{Binding Name}" LineBreakMode="WordWrap" />
+                                        <Label Text="{Binding Category}" TextColor="#666" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding DistanceText}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="{Binding [Tooltip_Competitors], Source={x:Static loc:LocalizationResourceManager.Instance}}" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding NearestCompetitors}" HeightRequest="120">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:NearbyPoiViewModel">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6" Padding="0,2">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="0">
+                                        <Label Text="{Binding Name}" LineBreakMode="WordWrap" />
+                                        <Label Text="{Binding Category}" TextColor="#666" FontSize="12" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding DistanceText}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
     </Border>
 </ContentView>
-

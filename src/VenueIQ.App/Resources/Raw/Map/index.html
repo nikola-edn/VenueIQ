@@ -36,45 +36,147 @@
         map.events.add('ready', () => {
           // Placeholder sources/layers
           window.venueiq = window.venueiq || {};
-          window.venueiq.datasource = new atlas.source.DataSource('venueiq-data');
-          map.sources.add(window.venueiq.datasource);
-          window.venueiq.heatLayer = new atlas.layer.HeatMapLayer(window.venueiq.datasource, 'venueiq-heat', {
+          // Separate sources: points (for heatmap) and polygons (for choropleth)
+          window.venueiq.pointSource = new atlas.source.DataSource('venueiq-points');
+          window.venueiq.polySource = new atlas.source.DataSource('venueiq-polys');
+          window.venueiq.topSource = new atlas.source.DataSource('venueiq-top');
+          map.sources.add(window.venueiq.pointSource);
+          map.sources.add(window.venueiq.polySource);
+          map.sources.add(window.venueiq.topSource);
+          // Heatmap (off by default; available via overlay toggle)
+          window.venueiq.heatLayer = new atlas.layer.HeatMapLayer(window.venueiq.pointSource, 'venueiq-heat', {
             colorGradient: [
               'interpolate', ['linear'], ['heatmap-density'],
-              0.0, '#1B4965',
-              0.5, '#5FA8D3',
-              0.8, '#BEE9E8',
-              1.0, '#FFD166'
+              0.00, '#2C7BB6',
+              0.35, '#ABD9E9',
+              0.55, '#FFFF8C',
+              0.75, '#FDAE61',
+              1.00, '#D7191C'
             ],
-            weight: ['get', 'score']
+            radius: ['interpolate', ['linear'], ['zoom'], 10, 18, 12, 24, 14, 32, 16, 40],
+            intensity: 1.6,
+            opacity: 0.85,
+            weight: ['get', 'scoreVis'],
+            visible: false
           });
           map.layers.add(window.venueiq.heatLayer);
+
+          // Graduated circles (bubbles) based on scoreVis — default visible
+          window.venueiq.bubbleLayer = new atlas.layer.BubbleLayer(window.venueiq.pointSource, 'venueiq-bubbles', {
+            radius: ['interpolate', ['linear'], ['get', 'scoreVis'], 0.0, 5, 0.5, 16, 1.0, 26],
+            color: ['get', 'color'],
+            strokeColor: '#FFFFFF',
+            strokeWidth: 1.2,
+            opacity: 0.95,
+            visible: false
+          });
+          map.layers.add(window.venueiq.bubbleLayer);
+
+          // Top results only (bubbles) visible by default
+          window.venueiq.topLayer = new atlas.layer.BubbleLayer(window.venueiq.topSource, 'venueiq-top-bubbles', {
+            radius: ['get', 'radius'],
+            color: ['coalesce', ['get', 'color'], ['interpolate', ['linear'], ['get', 'scoreNorm'], 0.0, '#2C7BB6', 1.0, '#D7191C']],
+            strokeColor: '#FFFFFF',
+            strokeWidth: 1.4,
+            opacity: 0.95,
+            visible: true
+          });
+          map.layers.add(window.venueiq.topLayer);
+
+          // Choropleth fill for grid cells (can be toggled on for strict cell boundaries)
+          window.venueiq.fillLayer = new atlas.layer.PolygonLayer(window.venueiq.polySource, 'venueiq-fill', {
+            // Discrete classes for stronger contrast
+            fillColor: ['step', ['get', 'scoreVis'],
+              '#2C7BB6', 0.20, '#ABD9E9', 0.40, '#FFFF8C', 0.60, '#FDAE61', 0.80, '#D7191C'],
+            fillOpacity: 0.55,
+            strokeColor: '#FFFFFF',
+            strokeWidth: 0.2,
+            visible: false
+          });
+          map.layers.add(window.venueiq.fillLayer);
 
           // Highlight layer for selection
           window.venueiq.hlSource = new atlas.source.DataSource('venueiq-hl');
           map.sources.add(window.venueiq.hlSource);
           window.venueiq.hlLayer = new atlas.layer.SymbolLayer(window.venueiq.hlSource, 'venueiq-hl-layer', {
             iconOptions: { image: 'marker-blue', allowOverlap: true },
-            textOptions: { textField: ['format', ['round', ['get', 'score'], 2]], offset: [0, -2] }
+            textOptions: { textField: ['format', ['round', ['get', 'scoreRaw'], 2]], offset: [0, -2] }
           });
           map.layers.add(window.venueiq.hlLayer);
+
+          function centroidOfPolygon(coords){
+            // coords is array of rings; use first ring for centroid (approximate)
+            try {
+              const ring = (coords && coords[0]) || [];
+              if (ring.length === 0) return null;
+              let x = 0, y = 0;
+              for (let i=0;i<ring.length;i++){ x += ring[i][0]; y += ring[i][1]; }
+              return [x / ring.length, y / ring.length];
+            } catch { return null; }
+          }
 
           window.venueiq.updateHeatmapB64 = function(b64){
             try {
               const json = JSON.parse(atob(b64));
               const feats = json.features || [];
-              const shapes = feats.map(f => new atlas.Shape(new atlas.data.Point(f.geometry.coordinates), f.properties));
-              window.venueiq.datasource.clear();
-              if (shapes.length > 0) {
-                window.venueiq.datasource.add(shapes);
+              const pointShapes = [];
+              const polyShapes = [];
+              for (let i=0;i<feats.length;i++){
+                const f = feats[i];
+                if (!f || !f.geometry) continue;
+                const g = f.geometry;
+                let geom = null;
+                switch (g.type){
+                  case 'Polygon': {
+                    geom = new atlas.data.Polygon(g.coordinates);
+                    polyShapes.push(new atlas.Shape(geom, f.properties));
+                    const c = centroidOfPolygon(g.coordinates);
+                    if (c) pointShapes.push(new atlas.Shape(new atlas.data.Point(c), f.properties));
+                    break;
+                  }
+                  case 'MultiPolygon': {
+                    geom = new atlas.data.MultiPolygon(g.coordinates);
+                    polyShapes.push(new atlas.Shape(geom, f.properties));
+                    // Take centroid of first polygon's first ring
+                    const first = (g.coordinates && g.coordinates[0]) || [];
+                    const c = centroidOfPolygon(first);
+                    if (c) pointShapes.push(new atlas.Shape(new atlas.data.Point(c), f.properties));
+                    break;
+                  }
+                  case 'LineString': {
+                    geom = new atlas.data.LineString(g.coordinates);
+                    polyShapes.push(new atlas.Shape(geom, f.properties));
+                    break;
+                  }
+                  case 'Point': default: {
+                    geom = new atlas.data.Point(g.coordinates);
+                    pointShapes.push(new atlas.Shape(geom, f.properties));
+                    break;
+                  }
+                }
               }
+              window.venueiq.pointSource.clear();
+              window.venueiq.polySource.clear();
+              if (pointShapes.length > 0) window.venueiq.pointSource.add(pointShapes);
+              if (polyShapes.length > 0) window.venueiq.polySource.add(polyShapes);
+              // Debug: show counts per bucket in legend
+              try {
+                const legend = document.getElementById('legend');
+                const counts = {1:0,2:0,3:0,4:0,5:0};
+                for (let i=0;i<pointShapes.length;i++){
+                  const b = pointShapes[i].getProperties().bucket;
+                  if (counts[b] !== undefined) counts[b]++;
+                }
+                legend.textContent = `Circles — total ${pointShapes.length} | b1:${counts[1]} b2:${counts[2]} b3:${counts[3]} b4:${counts[4]} b5:${counts[5]}`;
+              } catch {}
               window.location.href = 'app://mapRendered';
             } catch (e) {
               window.location.href = 'app://mapError?' + encodeURIComponent(e.message || 'parse');
             }
           };
           window.venueiq.clearHeatmap = function(){
-            window.venueiq.datasource && window.venueiq.datasource.clear();
+            try { window.venueiq.pointSource.clear(); } catch {}
+            try { window.venueiq.polySource.clear(); } catch {}
             window.location.href = 'app://mapRendered';
           };
 
@@ -87,6 +189,15 @@
             } catch (e) {
               window.location.href = 'app://mapError?' + encodeURIComponent(e.message || 'center');
             }
+          };
+
+          // Provide center to host (as "lat,lng")
+          window.venueiq.getCenter = function(){
+            try {
+              const c = map.getCamera().center;
+              if (!c) return '';
+              return c[1].toString() + ',' + c[0].toString();
+            } catch(e) { return ''; }
           };
 
           // Notify host app
@@ -103,6 +214,62 @@
               return url.split(',')[1];
             } catch (e){
               return 'ERROR:' + (e && e.message ? e.message : 'export');
+            }
+          };
+
+          // Allow host to switch overlay mode: 'bubbles' | 'heat' | 'grid'
+          window.venueiq.setOverlay = function(mode){
+            const bubbles = mode === 'bubbles' || !mode;
+            const heat = mode === 'heat';
+            const grid = mode === 'grid';
+            window.venueiq.bubbleLayer.setOptions({ visible: bubbles });
+            window.venueiq.heatLayer.setOptions({ visible: heat });
+            window.venueiq.fillLayer.setOptions({ visible: grid });
+            // Top results always on
+            window.venueiq.topLayer.setOptions({ visible: true });
+          };
+
+          // Update top results overlay only
+          window.venueiq.updateTopResultsB64 = function(b64){
+            try {
+              const json = JSON.parse(atob(b64));
+              const feats = json.features || [];
+              const shapes = [];
+              for (let i=0;i<feats.length;i++){
+                const f = feats[i];
+                if (!f || !f.geometry) continue;
+                const g = f.geometry;
+                if (g.type !== 'Point') continue;
+                const props = Object.assign({}, f.properties || {});
+                let t = (typeof props.scoreNorm === 'number') ? Math.max(0, Math.min(1, props.scoreNorm)) : 0.5;
+                // Fallbacks if properties missing
+                if (!props.radius) props.radius = 8 + Math.pow(t, 0.6) * 22;
+                if (!props.color) {
+                  // Blue to Red gradient
+                  const r1=0x2C, g1=0x7B, b1=0xB6, r2=0xD7, g2=0x19, b2=0x1C;
+                  const r = Math.round(r1 + (r2 - r1) * t);
+                  const gC = Math.round(g1 + (g2 - g1) * t);
+                  const b = Math.round(b1 + (b2 - b1) * t);
+                  props.color = `rgb(${r},${gC},${b})`;
+                }
+                const s = new atlas.Shape(new atlas.data.Point(g.coordinates));
+                s.setProperties(props);
+                shapes.push(s);
+              }
+              window.venueiq.topSource.clear();
+              if (shapes.length > 0) window.venueiq.topSource.add(shapes);
+              // Hide other visualizations
+              window.venueiq.bubbleLayer.setOptions({ visible: false });
+              window.venueiq.heatLayer.setOptions({ visible: false });
+              window.venueiq.fillLayer.setOptions({ visible: false });
+              const legend = document.getElementById('legend');
+              try {
+                const s0 = shapes[0]?.getProperties();
+                legend.textContent = `Top results — ${shapes.length}` + (s0 && s0.color ? ` | sample ${s0.color}` : '');
+              } catch { legend.textContent = `Top results — ${shapes.length}`; }
+              window.location.href = 'app://mapRendered';
+            } catch (e) {
+              window.location.href = 'app://mapError?' + encodeURIComponent(e.message || 'top');
             }
           };
         });

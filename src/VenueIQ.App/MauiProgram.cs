@@ -22,7 +22,8 @@ namespace VenueIQ.App
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+			builder.Logging.SetMinimumLevel(LogLevel.Debug);
+			builder.Logging.AddDebug();
 #endif
 
             // DI registrations

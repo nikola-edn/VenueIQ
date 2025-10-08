@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using VenueIQ.Core.Models;
 using VenueIQ.Core.Services;
 
@@ -8,6 +9,12 @@ public class CategoryMapProvider : IPoiCategoryMapProvider
 {
     private class MapEntry { public string[]? competitors { get; set; } public string[]? complements { get; set; } }
     private Dictionary<string, MapEntry>? _cache;
+    private readonly ILogger<CategoryMapProvider>? _logger;
+
+    public CategoryMapProvider(ILogger<CategoryMapProvider>? logger = null)
+    {
+        _logger = logger;
+    }
 
     public async Task<(IReadOnlyList<string> competitors, IReadOnlyList<string> complements)> GetCategoriesAsync(BusinessType business, CancellationToken ct = default)
     {
@@ -23,8 +30,11 @@ public class CategoryMapProvider : IPoiCategoryMapProvider
         };
         if (_cache.TryGetValue(key, out var entry))
         {
+            _logger?.LogDebug("CategoryMapProvider: Selected category set for {Business}: competitors={Competitors} complements={Complements}", business,
+                string.Join(',', entry.competitors ?? Array.Empty<string>()), string.Join(',', entry.complements ?? Array.Empty<string>()));
             return (entry.competitors ?? Array.Empty<string>(), entry.complements ?? Array.Empty<string>());
         }
+        _logger?.LogWarning("CategoryMapProvider: No mapping found for {Business} (key {Key}). Returning empty sets.", business, key);
         return (Array.Empty<string>(), Array.Empty<string>());
     }
 
@@ -35,4 +45,3 @@ public class CategoryMapProvider : IPoiCategoryMapProvider
                ?? new Dictionary<string, MapEntry>();
     }
 }
-

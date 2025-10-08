@@ -6,6 +6,7 @@ using VenueIQ.App.Utils;
 using System.Collections.ObjectModel;
 using VenueIQ.Core.Models;
 using VenueIQ.Core.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace VenueIQ.App.ViewModels;
 
@@ -111,6 +112,12 @@ public class MainViewModel : INotifyPropertyChanged
         RadiusKm = await _settings.GetRadiusKmAsync().ConfigureAwait(false);
         var w = await _settings.GetWeightsAsync().ConfigureAwait(false);
         WComplements = w.complements; WAccessibility = w.accessibility; WDemand = w.demand; WCompetition = w.competition;
+        try
+        {
+            var logger = Helpers.ServiceHost.GetRequiredService<Microsoft.Extensions.Logging.ILogger<MainViewModel>>();
+            logger?.LogDebug("MainViewModel.Load: radius={Radius} weights C={C:0.00} A={A:0.00} D={D:0.00} Q={Q:0.00}", RadiusKm, WComplements, WAccessibility, WDemand, WCompetition);
+        }
+        catch { /* ignore */ }
         // Initialize percent UI from persisted decimals
         var pos = WComplements + WAccessibility + WDemand;
         if (pos <= 1e-9)
@@ -124,6 +131,18 @@ public class MainViewModel : INotifyPropertyChanged
             WDemandPercent = Math.Round(WDemand / pos * 100.0);
             WCompetitionPercent = Math.Round(WCompetition * 100.0);
         }
+
+        // Build Business Type options (localized via resource keys)
+        if (BusinessTypes.Count == 0)
+        {
+            BusinessTypes.Add(new BusinessTypeOption(BusinessType.Coffee, "BusinessType.Coffee"));
+            BusinessTypes.Add(new BusinessTypeOption(BusinessType.Pharmacy, "BusinessType.Pharmacy"));
+            BusinessTypes.Add(new BusinessTypeOption(BusinessType.Grocery, "BusinessType.Grocery"));
+            BusinessTypes.Add(new BusinessTypeOption(BusinessType.Fitness, "BusinessType.Fitness"));
+            BusinessTypes.Add(new BusinessTypeOption(BusinessType.KidsServices, "BusinessType.KidsServices"));
+        }
+        var saved = await _settings.GetBusinessTypeAsync().ConfigureAwait(false);
+        SelectedBusinessType = BusinessTypes.FirstOrDefault(b => b.Type == saved) ?? BusinessTypes.First();
     }
 
     // Live recompute infrastructure
@@ -148,6 +167,13 @@ public class MainViewModel : INotifyPropertyChanged
 
     private string? _statusMessageKey;
     public string? StatusMessageKey { get => _statusMessageKey; private set { if (_statusMessageKey != value) { _statusMessageKey = value; OnPropertyChanged(); } } }
+
+    // Expose controlled updates for status message from Views
+    public void ClearStatusMessage() => StatusMessageKey = null;
+    public void SetStatusMessage(string key)
+    {
+        if (!string.IsNullOrWhiteSpace(key)) StatusMessageKey = key;
+    }
 
     public event EventHandler<IReadOnlyList<CellScore>>? WeightsRecomputed;
 
@@ -243,6 +269,14 @@ public class MainViewModel : INotifyPropertyChanged
                 Lat = c.Lat,
                 Lng = c.Lng,
                 CI = c.CI, CoI = c.CoI, AI = c.AI, DI = c.DI,
+                WComplementsUsed = WComplements,
+                WAccessibilityUsed = WAccessibility,
+                WDemandUsed = WDemand,
+                WCompetitionUsed = WCompetition,
+                ContribComplements = Math.Round(WComplements * c.CoI, 3),
+                ContribAccessibility = Math.Round(WAccessibility * c.AI, 3),
+                ContribDemand = Math.Round(WDemand * c.DI, 3),
+                ContribCompetition = Math.Round(-WCompetition * c.CI, 3),
                 PrimaryBadgeKey = c.PrimaryBadge,
                 CompetitionBadge = BadgeLogic.ForCompetition(c.CI),
                 ComplementsBadge = BadgeLogic.ForComplements(c.CoI),
@@ -274,5 +308,35 @@ public class MainViewModel : INotifyPropertyChanged
                 Selected = Results[0];
             }
         }
+    }
+
+    // Business Type selection
+    public ObservableCollection<BusinessTypeOption> BusinessTypes { get; } = new();
+    private BusinessTypeOption? _selectedBusinessType;
+    public BusinessTypeOption? SelectedBusinessType
+    {
+        get => _selectedBusinessType;
+        set
+        {
+            if (_selectedBusinessType == value) return;
+            _selectedBusinessType = value;
+            OnPropertyChanged();
+            if (value is not null)
+            {
+                _ = _settings.SetBusinessTypeAsync(value.Type);
+            }
+        }
+    }
+
+    public sealed class BusinessTypeOption
+    {
+        public BusinessType Type { get; }
+        // Resource key like "BusinessType.Coffee" resolved via ResKeyToTextConverter in XAML
+        public string NameKey { get; }
+        public BusinessTypeOption(BusinessType type, string nameKey)
+        {
+            Type = type; NameKey = nameKey;
+        }
+        public override string ToString() => NameKey;
     }
 }

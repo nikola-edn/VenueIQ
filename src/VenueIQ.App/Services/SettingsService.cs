@@ -7,6 +7,7 @@ public class SettingsService
     private const string ApiKeyKey = "azureMapsApiKey";
     private const string LanguageKey = "preferredLanguage"; // sr-Latn | en
     private const string RadiusKey = "radiusKm";
+    private const string BusinessTypeKey = "businessType";
     private const string WComplementsKey = "w.complements";
     private const string WAccessibilityKey = "w.accessibility";
     private const string WDemandKey = "w.demand";
@@ -29,6 +30,19 @@ public class SettingsService
     public Task SetLanguageAsync(string lang)
     {
         Preferences.Default.Set(LanguageKey, lang);
+        return Task.CompletedTask;
+    }
+
+    // Business Type
+    public Task<VenueIQ.Core.Models.BusinessType> GetBusinessTypeAsync()
+    {
+        var s = Preferences.Default.Get(BusinessTypeKey, nameof(VenueIQ.Core.Models.BusinessType.Coffee));
+        return Task.FromResult(Enum.TryParse<VenueIQ.Core.Models.BusinessType>(s, out var t) ? t : VenueIQ.Core.Models.BusinessType.Coffee);
+    }
+
+    public Task SetBusinessTypeAsync(VenueIQ.Core.Models.BusinessType t)
+    {
+        Preferences.Default.Set(BusinessTypeKey, t.ToString());
         return Task.CompletedTask;
     }
 
@@ -62,6 +76,7 @@ public class SettingsService
     public Task ResetToDefaultsAsync()
     {
         Preferences.Default.Set(LanguageKey, "sr-Latn");
+        Preferences.Default.Set(BusinessTypeKey, nameof(VenueIQ.Core.Models.BusinessType.Coffee));
         Preferences.Default.Set(RadiusKey, 2.0);
         Preferences.Default.Set(WComplementsKey, 0.35);
         Preferences.Default.Set(WAccessibilityKey, 0.25);

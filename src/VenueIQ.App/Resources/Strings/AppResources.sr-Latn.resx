@@ -12,6 +12,14 @@
   <data name="Startup_Error_InvalidKey" xml:space="preserve"><value>Nevažeći API ključ. Proverite i pokušajte ponovo.</value></data>
   <data name="Startup_Error_Connection" xml:space="preserve"><value>Veza nije uspela. Proverite mrežu i pokušajte ponovo.</value></data>
   <data name="Main_Analyze" xml:space="preserve"><value>Analiziraj</value></data>
+  <data name="Map_Overlay_Heat" xml:space="preserve"><value>Toplotna</value></data>
+  <data name="Map_Overlay_Grid" xml:space="preserve"><value>Mreža</value></data>
+  <data name="Map_Overlay_Circles" xml:space="preserve"><value>Krugovi</value></data>
+  <data name="BusinessType_Coffee" xml:space="preserve"><value>Kafić</value></data>
+  <data name="BusinessType_Pharmacy" xml:space="preserve"><value>Apoteka</value></data>
+  <data name="BusinessType_Grocery" xml:space="preserve"><value>Prodavnica</value></data>
+  <data name="BusinessType_Fitness" xml:space="preserve"><value>Fitnes</value></data>
+  <data name="BusinessType_KidsServices" xml:space="preserve"><value>Dečije usluge</value></data>
   <data name="Main_ResetDefaults" xml:space="preserve"><value>Vrati na podrazumevano</value></data>
   <data name="Settings_Title" xml:space="preserve"><value>Podešavanja</value></data>
   <data name="Settings_LanguageLabel" xml:space="preserve"><value>Jezik:</value></data>
@@ -40,6 +48,8 @@
   <data name="rationale_high_demand" xml:space="preserve"><value>Visok potencijal potražnje u oblasti</value></data>
   <data name="rationale_high_competition" xml:space="preserve"><value>Velika gustina konkurencije</value></data>
   <data name="Weights_Updating" xml:space="preserve"><value>Ažuriranje…</value></data>
+  <data name="Tooltip_Score" xml:space="preserve"><value>Skor</value></data>
+  <data name="Tooltip_ScoreComposition" xml:space="preserve"><value>Kompozicija skora</value></data>
   <data name="Status_Updated" xml:space="preserve"><value>Ažurirano.</value></data>
   <data name="Recompute_PromptRerun" xml:space="preserve"><value>Nedostaju podaci. Prvo pokrenite punu analizu.</value></data>
   <data name="Recompute_NoCells" xml:space="preserve"><value>Nema rezultata za prikaz. Pokrenite analizu ponovo.</value></data>

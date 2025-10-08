@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.Extensions.Logging;
 using VenueIQ.App.Helpers;
 using VenueIQ.App.ViewModels;
 using VenueIQ.App.Controls;
@@ -10,11 +11,13 @@ namespace VenueIQ.App.Views
 {
     public partial class MainPage : ContentPage
     {
+        private readonly Microsoft.Extensions.Logging.ILogger<MainPage>? _logger;
         public MainPage()
         {
             InitializeComponent();
             var vm = ServiceHost.GetRequiredService<MainViewModel>();
             BindingContext = vm;
+            try { _logger = ServiceHost.GetRequiredService<Microsoft.Extensions.Logging.ILogger<MainPage>>(); } catch { /* ignore */ }
             _ = vm.LoadAsync();
             Appearing += async (_, __) =>
             {
@@ -23,6 +26,7 @@ namespace VenueIQ.App.Views
                 {
                     try
                     {
+                        _logger?.LogDebug("MainPage: initializing map lang={Lang}", lang);
                         Map.MapReady += (_, ____) => MapLoadingOverlay.IsVisible = false;
                         Map.HeatmapRendered += (_, ____) => MainThread.BeginInvokeOnMainThread(() =>
                             SemanticScreenReader.Announce(Helpers.LocalizationResourceManager.Instance["Map_HeatmapUpdated"]))
@@ -31,13 +35,16 @@ namespace VenueIQ.App.Views
                         {
                             MapLoadingOverlay.IsVisible = false;
                             // TODO: Hook telemetry/logging here
+                            _logger?.LogError("MainPage: MapError {Reason}", reason);
                             MainThread.BeginInvokeOnMainThread(() =>
                                 SemanticScreenReader.Announce(string.Format(Helpers.LocalizationResourceManager.Instance["Map_Error"], reason)));
                         };
                         await Map.InitializeAsync(apiKey, lang);
+                        // Overlay defaults handled by UpdateTopResults flow
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        _logger?.LogError(ex, "MainPage: Map initialization failed");
                         MapLoadingOverlay.IsVisible = false;
                     }
                 }
@@ -58,6 +65,8 @@ namespace VenueIQ.App.Views
             HookSlider(AccessibilitySlider);
             HookSlider(DemandSlider);
             HookSlider(CompetitionSlider);
+
+            // Removed overlay picker; default overlay managed by top results updater
 
             // Live recompute: update map when weights recompute
             vm.WeightsRecomputed += async (_, cells) =>
@@ -148,7 +157,7 @@ namespace VenueIQ.App.Views
                 var format = ExportFormatJpg.IsChecked ? "jpeg" : "png";
                 var scale = ExportResHigh.IsChecked ? 2.0 : 1.0;
                 var weights = (vm.WComplements, vm.WAccessibility, vm.WDemand, vm.WCompetition);
-                var business = "Coffee"; // TODO: bind from picker when wired
+                var business = vm.SelectedBusinessType?.Type.ToString() ?? "Coffee";
 
                 var export = ServiceHost.GetRequiredService<ExportService>();
                 var path = await export.ExportHeatmapAsync(Map, format, scale, weights, vm.RadiusKm, business);
@@ -230,7 +239,7 @@ namespace VenueIQ.App.Views
 
                 var vm = (MainViewModel)BindingContext;
                 var weights = (vm.WComplements, vm.WAccessibility, vm.WDemand, vm.WCompetition);
-                var business = "Coffee"; // TODO: bind from picker when wired
+                var business = vm.SelectedBusinessType?.Type.ToString() ?? "Coffee";
                 var opts = new PdfExportOptions
                 {
                     Language = ExportPdfLanguagePicker.SelectedIndex == 1 ? "en" : "sr-Latn",
@@ -277,40 +286,105 @@ namespace VenueIQ.App.Views
         {
             try
             {
+                _logger?.LogInformation("MainPage: Analyze clicked");
                 _renderCts?.Cancel();
                 _renderCts = new CancellationTokenSource();
                 MapLoadingOverlay.IsVisible = true;
                 var vm = (MainViewModel)BindingContext;
                 var (apiKey, lang) = await vm.GetMapInitAsync();
-                // BusinessType selection TBD; default to Coffee for MVP
-                var input = new AnalysisInput(BusinessType.Coffee, 44.787, 20.449, vm.RadiusKm, lang);
+                var selBiz = vm.SelectedBusinessType?.Type ?? BusinessType.Coffee;
+                var center = await Map.GetCenterAsync(_renderCts.Token);
+                double lat = center?.lat ?? 44.787;
+                double lng = center?.lng ?? 20.449;
+                _logger?.LogInformation("MainPage: Using map center lat={Lat:F5}, lng={Lng:F5}", lat, lng);
+                var input = new AnalysisInput(selBiz, lat, lng, vm.RadiusKm, lang);
                 var weights = new Weights(vm.WComplements, vm.WAccessibility, vm.WDemand, vm.WCompetition);
                 var analysis = ServiceHost.GetRequiredService<MapAnalysisService>();
                 var res = await analysis.AnalyzeAsync(input, weights, _renderCts.Token);
                 if (res.CellDetails is { Count: > 0 })
                 {
-                    var geo = GeoJsonHelper.BuildFeatureCollection(res.CellDetails);
-                    await Map.UpdateHeatmapAsync(geo, _renderCts.Token);
                     vm.SetResults(res.CellDetails);
+                    // Build Top Results markers only
+                    var min = res.CellDetails.Min(c => c.Score);
+                    var max = res.CellDetails.Max(c => c.Score);
+                    var topJson = BuildTopMarkersJson(vm.Results, min, max);
+                    await Map.UpdateTopResultsAsync(topJson, _renderCts.Token);
+                    vm.ClearStatusMessage();
+                    _logger?.LogInformation("MainPage: Analysis done, cells={Count}", res.CellDetails.Count);
                 }
                 else
                 {
                     await Map.ClearHeatmapAsync(_renderCts.Token);
                     vm.Results.Clear();
+                    vm.SetStatusMessage("Recompute_NoCells");
+                    _logger?.LogWarning("MainPage: Analysis returned no cells (map cleared)");
                 }
             }
             catch (OperationCanceledException)
             {
                 // ignore
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: telemetry
+                _logger?.LogError(ex, "MainPage: RunAnalysisAsync failed");
             }
             finally
             {
                 MapLoadingOverlay.IsVisible = false;
             }
+        }
+
+        private static string BuildTopMarkersJson(IEnumerable<ResultItemViewModel> results, double minScore, double maxScore)
+        {
+            static string LerpColor(double t)
+            {
+                // Blue (#2C7BB6) to Red (#D7191C)
+                int r1=0x2C, g1=0x7B, b1=0xB6;
+                int r2=0xD7, g2=0x19, b2=0x1C;
+                int r = (int)Math.Round(r1 + (r2 - r1) * t);
+                int g = (int)Math.Round(g1 + (g2 - g1) * t);
+                int b = (int)Math.Round(b1 + (b2 - b1) * t);
+                return $"rgb({r},{g},{b})";
+            }
+
+            var list = results.ToList();
+            double range = Math.Max(1e-9, maxScore - minScore);
+            using var ms = new MemoryStream();
+            using var jw = new System.Text.Json.Utf8JsonWriter(ms);
+            jw.WriteStartObject();
+            jw.WriteString("type", "FeatureCollection");
+            jw.WritePropertyName("features");
+            jw.WriteStartArray();
+            foreach (var r in list)
+            {
+                var norm = Math.Clamp((r.Score - minScore) / range, 0.0, 1.0);
+                var color = LerpColor(norm);
+                var radius = 8.0 + Math.Pow(norm, 0.6) * 22.0; // 8 .. 30 px
+                jw.WriteStartObject();
+                jw.WriteString("type", "Feature");
+                jw.WritePropertyName("geometry");
+                jw.WriteStartObject();
+                jw.WriteString("type", "Point");
+                jw.WritePropertyName("coordinates");
+                jw.WriteStartArray();
+                jw.WriteNumberValue(r.Lng);
+                jw.WriteNumberValue(r.Lat);
+                jw.WriteEndArray();
+                jw.WriteEndObject();
+                jw.WritePropertyName("properties");
+                jw.WriteStartObject();
+                jw.WriteNumber("scoreRaw", r.Score);
+                jw.WriteNumber("scoreNorm", norm);
+                jw.WriteNumber("radius", radius);
+                jw.WriteString("color", color);
+                jw.WriteNumber("rank", r.Rank);
+                jw.WriteEndObject();
+                jw.WriteEndObject();
+            }
+            jw.WriteEndArray();
+            jw.WriteEndObject();
+            jw.Flush();
+            return System.Text.Encoding.UTF8.GetString(ms.ToArray());
         }
 
         private void ResultsList_SelectionSetup()

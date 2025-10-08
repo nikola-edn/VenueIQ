@@ -20,7 +20,7 @@ public class PoiSearchClientCacheTests
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Calls++;
-            var json = "{\"results\":[{\"id\":\"1\",\"poi\":{\"name\":\"Cafe\",\"classifications\":[{\"code\":\"POI_CAFE\"}]},\"position\":{\"lat\":44.8,\"lon\":20.5},\"dist\":100.0}]}";
+            var json = "{\"results\":[{\"id\":\"1\",\"poi\":{\"name\":\"Cafe\",\"classifications\":[{\"code\":\"CAFE_PUB\"}]},\"position\":{\"lat\":44.8,\"lon\":20.5},\"dist\":100.0}]}";
             var resp = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(json)
@@ -37,7 +37,7 @@ public class PoiSearchClientCacheTests
     private sealed class FakeCat : IPoiCategoryMapProvider
     {
         public Task<(IReadOnlyList<string> competitors, IReadOnlyList<string> complements)> GetCategoriesAsync(BusinessType business, CancellationToken ct = default)
-            => Task.FromResult<(IReadOnlyList<string> competitors, IReadOnlyList<string> complements)>((competitors: new[] { "POI_CAFE" }, complements: new[] { "POI_PARKING" }));
+            => Task.FromResult<(IReadOnlyList<string> competitors, IReadOnlyList<string> complements)>((competitors: new[] { "CAFE_PUB" }, complements: new[] { "OPEN_PARKING_AREA" }));
     }
 
     [Fact]
@@ -58,4 +58,3 @@ public class PoiSearchClientCacheTests
         Assert.Equal(callsAfterFirst, handler.Calls); // no additional HTTP calls on cached request
     }
 }
-

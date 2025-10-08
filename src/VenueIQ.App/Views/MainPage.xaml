@@ -10,7 +10,10 @@
 
     <Grid RowDefinitions="Auto,*" Padding="16">
             <Grid x:Name="HeaderBar" ColumnDefinitions="*,Auto,Auto,Auto,Auto" Row="0" Margin="0,0,0,12">
-            <Picker x:Name="BusinessTypePicker" AutomationId="Main.BusinessTypePicker"/>
+            <Picker x:Name="BusinessTypePicker" AutomationId="Main.BusinessTypePicker"
+                    ItemsSource="{Binding BusinessTypes}"
+                    ItemDisplayBinding="{Binding NameKey, Converter={StaticResource ResKeyToTextConverter}}"
+                    SelectedItem="{Binding SelectedBusinessType, Mode=TwoWay}"/>
             <Slider Grid.Column="1" x:Name="RadiusSlider" AutomationId="Main.RadiusSlider" Minimum="0.5" Maximum="5" Value="{Binding RadiusKm}"/>
             <Button Grid.Column="2" x:Name="AnalyzeButton" AutomationId="Main.AnalyzeButton" Text="{Binding [Main_Analyze], Source={x:Static loc:LocalizationResourceManager.Instance}}" IsEnabled="{Binding IsAnalyzeEnabled}"/>
             <Button Grid.Column="3" x:Name="ExportButton" AutomationId="Main.ExportButton" Text="{Binding [Export_Heatmap], Source={x:Static loc:LocalizationResourceManager.Instance}}"/>
@@ -18,7 +21,7 @@
         </Grid>
 
         <Grid Row="1" ColumnDefinitions="2*,*" RowDefinitions="Auto,*,Auto" ColumnSpacing="12">
-            <Grid>
+            <Grid Grid.RowSpan="3" VerticalOptions="FillAndExpand">
                 <controls:MapWebView x:Name="Map" />
                 <Grid x:Name="MapLoadingOverlay" AutomationId="Main.MapLoadingOverlay" BackgroundColor="#66000000" IsVisible="True">
                     <Label Text="{Binding [Main_LoadingMap], Source={x:Static loc:LocalizationResourceManager.Instance}}" HorizontalOptions="Center" VerticalOptions="Center"/>
@@ -116,7 +119,7 @@
                                 <Label Text="{Binding PrimaryBadgeKey, Converter={StaticResource ResKeyToTextConverter}}" />
                                 <CollectionView ItemsSource="{Binding SupportingBadgeKeys}" ItemsLayout="HorizontalList">
                                     <CollectionView.ItemTemplate>
-                                        <DataTemplate>
+                                        <DataTemplate x:DataType="x:String">
                                             <Frame Padding="4" BackgroundColor="#EEEEEE">
                                                 <Label Text="{Binding ., Converter={StaticResource ResKeyToTextConverter}}" />
                                             </Frame>

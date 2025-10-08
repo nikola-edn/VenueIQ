@@ -60,6 +60,18 @@ public class ResultItemViewModel : INotifyPropertyChanged
 
     public string AutomationId => $"Results.Item.{Rank}";
 
+    // Weights used for this analysis (copied from MainViewModel at materialization time)
+    public double WComplementsUsed { get; set; }
+    public double WAccessibilityUsed { get; set; }
+    public double WDemandUsed { get; set; }
+    public double WCompetitionUsed { get; set; }
+
+    // Contributions to final score (w * index); competition is negative contribution
+    public double ContribComplements { get; set; }
+    public double ContribAccessibility { get; set; }
+    public double ContribDemand { get; set; }
+    public double ContribCompetition { get; set; }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? n = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
 }

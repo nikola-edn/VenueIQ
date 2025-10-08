@@ -48,9 +48,11 @@ public class AnalysisEngine
         var nearestComplPerCell = new List<List<(double d, PoiSummary poi)>>(grid.Cells.Count);
         var nearestAccessPerCell = new List<double?>(grid.Cells.Count);
 
-        // Category buckets for AI and DI derivation
-        static bool IsAccess(string? code) => code == "POI_PARKING" || code == "POI_PUBLIC_TRANSPORT_STATION";
-        static bool IsDemand(string? code) => code == "POI_SCHOOL" || code == "POI_OFFICE" || code == "POI_APARTMENT";
+        // Category buckets for AI and DI derivation (Azure Maps codes)
+        static bool IsAccess(string? code)
+            => code == "OPEN_PARKING_AREA" || code == "PARKING_GARAGE" || code == "PUBLIC_TRANSPORT_STOP";
+        static bool IsDemand(string? code)
+            => code == "SCHOOL" || code == "RESIDENTIAL_ACCOMMODATION" || code == "COMPANY" || code == "COMMERCIAL_BUILDING";
 
         for (int i = 0; i < grid.Cells.Count; i++)
         {
@@ -93,11 +95,12 @@ public class AnalysisEngine
         var list = new List<CellScore>(grid.Cells.Count);
         for (int i = 0; i < grid.Cells.Count; i++)
         {
-            var score = _score.CalculateScore(coiN[i], aiN[i], diN[i], ciN[i]);
+            var score = _score.CalculateScore(coiN[i], aiN[i], diN[i], ciN[i], weights);
             var cs = new CellScore
             {
                 Lat = grid.Cells[i].lat,
                 Lng = grid.Cells[i].lng,
+                StepMeters = grid.StepMeters,
                 CI = ciN[i], CoI = coiN[i], AI = aiN[i], DI = diN[i],
                 Score = score,
                 CoverageConfidence = Math.Clamp((coiN[i] + diN[i]) / 2.0, 0, 1)

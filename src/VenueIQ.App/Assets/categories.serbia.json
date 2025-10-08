@@ -1,22 +1,56 @@
 {
   "coffee": {
-    "competitors": ["POI_CAFE", "POI_COFFEE_SHOP"],
-    "complements": ["POI_PARKING", "POI_PUBLIC_TRANSPORT_STATION"]
+    "competitors": ["CAFE_PUB"],
+    "complements": [
+      "OPEN_PARKING_AREA",
+      "PARKING_GARAGE",
+      "PUBLIC_TRANSPORT_STOP",
+      "RESIDENTIAL_ACCOMMODATION",
+      "COMPANY",
+      "COMMERCIAL_BUILDING",
+      "PARK_RECREATION_AREA"
+    ]
   },
   "pharmacy": {
-    "competitors": ["POI_PHARMACY"],
-    "complements": ["POI_PARKING", "POI_HOSPITAL"]
+    "competitors": ["PHARMACY"],
+    "complements": [
+      "OPEN_PARKING_AREA",
+      "PARKING_GARAGE",
+      "PUBLIC_TRANSPORT_STOP",
+      "HOSPITAL_POLYCLINIC",
+      "HEALTH_CARE_SERVICE",
+      "RESIDENTIAL_ACCOMMODATION"
+    ]
   },
   "grocery": {
-    "competitors": ["POI_SUPERMARKET", "POI_GROCERY"],
-    "complements": ["POI_PARKING", "POI_PUBLIC_TRANSPORT_STATION"]
+    "competitors": ["MARKET", "SHOPPING_CENTER"],
+    "complements": [
+      "OPEN_PARKING_AREA",
+      "PARKING_GARAGE",
+      "PUBLIC_TRANSPORT_STOP",
+      "RESIDENTIAL_ACCOMMODATION",
+      "SCHOOL"
+    ]
   },
   "fitness": {
-    "competitors": ["POI_GYM"],
-    "complements": ["POI_PARKING", "POI_CAFE"]
+    "competitors": ["SPORTS_CENTER", "LEISURE_CENTER"],
+    "complements": [
+      "OPEN_PARKING_AREA",
+      "PARKING_GARAGE",
+      "PUBLIC_TRANSPORT_STOP",
+      "RESIDENTIAL_ACCOMMODATION",
+      "PARK_RECREATION_AREA",
+      "CAFE_PUB"
+    ]
   },
   "kids_services": {
-    "competitors": ["POI_SCHOOL", "POI_DAYCARE"],
-    "complements": ["POI_PARKING", "POI_PLAYGROUND"]
+    "competitors": ["SCHOOL"],
+    "complements": [
+      "OPEN_PARKING_AREA",
+      "PARKING_GARAGE",
+      "PUBLIC_TRANSPORT_STOP",
+      "PARK_RECREATION_AREA",
+      "RESIDENTIAL_ACCOMMODATION"
+    ]
   }
 }
