@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using VenueIQ.Core.Models;
+using VenueIQ.Core.Utils;
 
 namespace VenueIQ.App.ViewModels;
 
@@ -19,9 +20,14 @@ public class ResultItemViewModel : INotifyPropertyChanged
     public ObservableCollection<string> SupportingBadgeKeys { get; } = new();
     public ObservableCollection<string> RationaleKeys { get; } = new();
 
+    // Factor badges descriptors
+    public BadgeDescriptor? CompetitionBadge { get; set; }
+    public BadgeDescriptor? ComplementsBadge { get; set; }
+    public BadgeDescriptor? AccessibilityBadge { get; set; }
+    public BadgeDescriptor? DemandBadge { get; set; }
+
     public string AutomationId => $"Results.Item.{Rank}";
 
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? n = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
 }
-

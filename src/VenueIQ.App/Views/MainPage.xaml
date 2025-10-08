@@ -105,7 +105,7 @@
                             SelectedItem="{Binding Selected}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:ResultItemViewModel">
-                        <Grid Padding="8" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" x:Name="ResultItemRoot">
+                        <Grid Padding="8" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" x:Name="ResultItemRoot">
                             <Grid.AutomationId>
                                 <Binding Path="AutomationId" />
                             </Grid.AutomationId>
@@ -123,6 +123,12 @@
                                     </CollectionView.ItemTemplate>
                                 </CollectionView>
                             </HorizontalStackLayout>
+                            <FlexLayout Grid.Row="2" Grid.Column="1" Direction="Row" Wrap="Wrap" AlignItems="Start" AlignContent="Start" JustifyContent="Start">
+                                <controls:FactorBadge AutomationId="Results.Badge.Competition" Descriptor="{Binding CompetitionBadge}" />
+                                <controls:FactorBadge AutomationId="Results.Badge.Complements" Descriptor="{Binding ComplementsBadge}" />
+                                <controls:FactorBadge AutomationId="Results.Badge.Accessibility" Descriptor="{Binding AccessibilityBadge}" />
+                                <controls:FactorBadge AutomationId="Results.Badge.Demand" Descriptor="{Binding DemandBadge}" />
+                            </FlexLayout>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

@@ -77,4 +77,20 @@
   <data name="ExportPdf_Building" xml:space="preserve"><value>Generating PDF…</value></data>
   <data name="ExportPdf_Success_A11y" xml:space="preserve"><value>PDF export completed.</value></data>
   <data name="ExportPdf_Error" xml:space="preserve"><value>PDF export failed.</value></data>
+  <data name="badge_factor_competition" xml:space="preserve"><value>Competition</value></data>
+  <data name="badge_factor_complements" xml:space="preserve"><value>Complements</value></data>
+  <data name="badge_factor_accessibility" xml:space="preserve"><value>Accessibility</value></data>
+  <data name="badge_factor_demand" xml:space="preserve"><value>Demand</value></data>
+  <data name="badge_tt_competition_high" xml:space="preserve"><value>High competition in this area</value></data>
+  <data name="badge_tt_competition_medium" xml:space="preserve"><value>Moderate competition nearby</value></data>
+  <data name="badge_tt_competition_low" xml:space="preserve"><value>Low competition</value></data>
+  <data name="badge_tt_complements_high" xml:space="preserve"><value>Strong complements nearby</value></data>
+  <data name="badge_tt_complements_medium" xml:space="preserve"><value>Moderate complements</value></data>
+  <data name="badge_tt_complements_low" xml:space="preserve"><value>Few complements</value></data>
+  <data name="badge_tt_accessibility_high" xml:space="preserve"><value>Good access to parking/transit</value></data>
+  <data name="badge_tt_accessibility_medium" xml:space="preserve"><value>Moderate access</value></data>
+  <data name="badge_tt_accessibility_low" xml:space="preserve"><value>Limited access</value></data>
+  <data name="badge_tt_demand_high" xml:space="preserve"><value>High potential demand</value></data>
+  <data name="badge_tt_demand_medium" xml:space="preserve"><value>Moderate demand</value></data>
+  <data name="badge_tt_demand_low" xml:space="preserve"><value>Low demand</value></data>
 </root>

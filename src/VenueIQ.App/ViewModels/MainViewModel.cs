@@ -236,7 +236,11 @@ public class MainViewModel : INotifyPropertyChanged
                 Lat = c.Lat,
                 Lng = c.Lng,
                 CI = c.CI, CoI = c.CoI, AI = c.AI, DI = c.DI,
-                PrimaryBadgeKey = c.PrimaryBadge
+                PrimaryBadgeKey = c.PrimaryBadge,
+                CompetitionBadge = BadgeLogic.ForCompetition(c.CI),
+                ComplementsBadge = BadgeLogic.ForComplements(c.CoI),
+                AccessibilityBadge = BadgeLogic.ForAccessibility(c.AI),
+                DemandBadge = BadgeLogic.ForDemand(c.DI)
             };
             foreach (var b in c.SupportingBadges) vm.SupportingBadgeKeys.Add(b);
             foreach (var r in c.RationaleTokens) vm.RationaleKeys.Add(r);

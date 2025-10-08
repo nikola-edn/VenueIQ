@@ -77,4 +77,20 @@
   <data name="ExportPdf_Building" xml:space="preserve"><value>Generisanje PDF-a…</value></data>
   <data name="ExportPdf_Success_A11y" xml:space="preserve"><value>PDF izvoz je završen.</value></data>
   <data name="ExportPdf_Error" xml:space="preserve"><value>Izvoz PDF-a nije uspeo.</value></data>
+  <data name="badge_factor_competition" xml:space="preserve"><value>Konkurencija</value></data>
+  <data name="badge_factor_complements" xml:space="preserve"><value>Komplementi</value></data>
+  <data name="badge_factor_accessibility" xml:space="preserve"><value>Pristupačnost</value></data>
+  <data name="badge_factor_demand" xml:space="preserve"><value>Potražnja</value></data>
+  <data name="badge_tt_competition_high" xml:space="preserve"><value>Visoka konkurencija u ovoj oblasti</value></data>
+  <data name="badge_tt_competition_medium" xml:space="preserve"><value>Umerena konkurencija u blizini</value></data>
+  <data name="badge_tt_competition_low" xml:space="preserve"><value>Niska konkurencija</value></data>
+  <data name="badge_tt_complements_high" xml:space="preserve"><value>Jaki komplementarni objekti u blizini</value></data>
+  <data name="badge_tt_complements_medium" xml:space="preserve"><value>Umereni komplementi</value></data>
+  <data name="badge_tt_complements_low" xml:space="preserve"><value>Malo komplementa</value></data>
+  <data name="badge_tt_accessibility_high" xml:space="preserve"><value>Dobra pristupačnost (parking/javni prevoz)</value></data>
+  <data name="badge_tt_accessibility_medium" xml:space="preserve"><value>Umerena pristupačnost</value></data>
+  <data name="badge_tt_accessibility_low" xml:space="preserve"><value>Ograničena pristupačnost</value></data>
+  <data name="badge_tt_demand_high" xml:space="preserve"><value>Visok potencijal potražnje</value></data>
+  <data name="badge_tt_demand_medium" xml:space="preserve"><value>Umerena potražnja</value></data>
+  <data name="badge_tt_demand_low" xml:space="preserve"><value>Niska potražnja</value></data>
 </root>

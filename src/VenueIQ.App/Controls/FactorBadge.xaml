@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:VenueIQ.App.Helpers"
+             xmlns:controls="clr-namespace:VenueIQ.App.Controls"
+             x:Class="VenueIQ.App.Controls.FactorBadge"
+             x:Name="Root"
+             x:DataType="controls:FactorBadge">
+    <Border x:Name="BadgeBorder" Padding="8,6" MinimumHeightRequest="44" MinimumWidthRequest="44"
+            ToolTipProperties.Text="{Binding Source={x:Reference Root}, Path=Descriptor.TooltipKey, Converter={StaticResource ResKeyToTextConverter}}">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12" />
+        </Border.StrokeShape>
+        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+            <Label x:Name="IconLabel" Text="★" FontSize="12" VerticalOptions="Center"/>
+            <Label x:Name="TextLabel" VerticalOptions="Center" FontAttributes="Bold"
+                   Text="{Binding Source={x:Reference Root}, Path=Descriptor.TitleKey, Converter={StaticResource ResKeyToTextConverter}}" />
+        </HorizontalStackLayout>
+    </Border>
+</ContentView>
